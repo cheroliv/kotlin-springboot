@@ -66,8 +66,8 @@ class SignupController(private val signupService: SignupService) {
             when {
                 isNotEmpty() -> return badResponse(problemsModel, this)
                 else -> try {
-                    isLoginAvailable(this@acc)
-                    isEmailAvailable(this@acc)
+                    loginAvailable(this@acc)
+                    emailAvailable(this@acc)
                 } catch (e: UsernameAlreadyUsedException) {
                     return badResponse(
                         problemsModel, setOf(
@@ -180,7 +180,7 @@ class SignupController(private val signupService: SignupService) {
 
 
     @Throws(UsernameAlreadyUsedException::class)
-    private suspend fun isLoginAvailable(model: AccountCredentials) {
+    private suspend fun loginAvailable(model: AccountCredentials) {
         signupService.accountById(model.login!!).run {
             when {
                 this != null -> if (!activated) signupService.deleteAccount(toAccount())
@@ -190,7 +190,7 @@ class SignupController(private val signupService: SignupService) {
     }
 
     @Throws(EmailAlreadyUsedException::class)
-    private suspend fun isEmailAvailable(model: AccountCredentials) {
+    private suspend fun emailAvailable(model: AccountCredentials) {
         signupService.accountById(model.email!!).run {
             when {
                 this != null -> if (!activated) signupService.deleteAccount(toAccount())
