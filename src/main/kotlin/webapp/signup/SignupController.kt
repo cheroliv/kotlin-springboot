@@ -62,7 +62,7 @@ class SignupController(private val signupService: SignupService) {
         @RequestBody account: AccountCredentials,
         exchange: ServerWebExchange
     ): ResponseEntity<ProblemDetail> = account.run acc@{
-        signupChecks(exchange, this@acc).run {
+        signupChecks(this@acc, exchange).run {
             when {
                 isNotEmpty() -> return badResponse(problemsModel, this)
                 else -> try {
@@ -110,8 +110,8 @@ class SignupController(private val signupService: SignupService) {
     )
 
     private fun signupChecks(
-        exchange: ServerWebExchange,
-        accountCredentials: AccountCredentials
+        accountCredentials: AccountCredentials,
+        exchange: ServerWebExchange
     ): Set<Map<String, String?>> {
         byProvider(HibernateValidator::class.java)
             .configure()
