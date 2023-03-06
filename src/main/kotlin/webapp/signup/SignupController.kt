@@ -36,6 +36,16 @@ import java.util.Locale.*
 @RequestMapping(ACCOUNT_API)
 class SignupController(private val signupService: SignupService) {
 
+    companion object {
+        val problemsModel = ProblemsModel(
+            type = "https://cheroliv.github.io/problem/constraint-violation",
+            title = "Data binding and validation failure",
+            path = "$ACCOUNT_API$SIGNUP_API",
+            message = "error.validation",
+            status = BAD_REQUEST.value(),
+        )
+    }
+
     internal class SignupException(message: String) : RuntimeException(message)
 
     /**
@@ -51,71 +61,75 @@ class SignupController(private val signupService: SignupService) {
     suspend fun signup(
         @RequestBody account: AccountCredentials,
         exchange: ServerWebExchange
-    ): ResponseEntity<ProblemDetail> =
-        account.run acc@{
-            ProblemsModel(
-                type = "https://cheroliv.github.io/problem/constraint-violation",
-                title = "Data binding and validation failure",
-                path = "$ACCOUNT_API$SIGNUP_API",
-                message = "error.validation",
-                status = BAD_REQUEST.value(),
-            ).run pm@{
-                signupChecks(
-                    exchange,
-                    this@acc
-                ).run {
-                    when {
-                        isNotEmpty() -> return badResponse(this@pm, this@run)
-                        else -> try {
-                            isLoginAvailable(this@acc)
-                            isEmailAvailable(this@acc)
-                        } catch (e: UsernameAlreadyUsedException) {
-                            return badRequest().body(
-                                forStatus(BAD_REQUEST).apply {
-                                    type = URI(this@pm.type)
-                                    title = this@pm.title
-                                    status = BAD_REQUEST.value()
-                                    setProperty("path", this@pm.path)
-                                    setProperty("message", this@pm.message)
-                                    setProperty("fieldErrors", this@pm.fieldErrors.apply {
-                                        add(
-                                            mapOf(
-                                                "objectName" to objectName,
-                                                "field" to LOGIN_FIELD,
-                                                "message" to e.message!!
-                                            )
-                                        )
-                                    })
-                                }
-                            )
-                        } catch (e: EmailAlreadyUsedException) {
-                            return badRequest().body(
-                                forStatus(BAD_REQUEST).apply {
-                                    type = URI(this@pm.type)
-                                    title = this@pm.title
-                                    status = BAD_REQUEST.value()
-                                    setProperty("path", path)
-                                    setProperty("message", this@pm.message)
-                                    setProperty("fieldErrors", this@pm.fieldErrors.apply {
-                                        add(
-                                            mapOf(
-                                                "objectName" to objectName,
-                                                "field" to EMAIL_FIELD,
-                                                "message" to e.message!!
-                                            )
-                                        )
-                                    })
-                                }
-                            )
-                        }
+    ): ResponseEntity<ProblemDetail> = account.run acc@{
+        problemsModel.run pm@{
+            signupChecks(exchange, this@acc).run {
+                when {
+                    isNotEmpty() -> return badResponse(this@pm, this@run)
+                    else -> try {
+                        isLoginAvailable(this@acc)
+                        isEmailAvailable(this@acc)
+                    } catch (e: UsernameAlreadyUsedException) {
+                        return badResponse(
+                            this@pm, setOf(mapOf(
+                                    "objectName" to objectName,
+                                    "field" to LOGIN_FIELD,
+                                    "message" to e.message!!
+                                ))
+                        )
+//                            return badRequest().body(
+//                                forStatus(BAD_REQUEST).apply {
+//                                    type = URI(this@pm.type)
+//                                    title = this@pm.title
+//                                    status = BAD_REQUEST.value()
+//                                    setProperty("path", this@pm.path)
+//                                    setProperty("message", this@pm.message)
+//                                    setProperty("fieldErrors", this@pm.fieldErrors.apply {
+//                                        add(
+//                                            mapOf(
+//                                                "objectName" to objectName,
+//                                                "field" to LOGIN_FIELD,
+//                                                "message" to e.message!!
+//                                            )
+//                                        )
+//                                    })
+//                                }
+//                            )
+                    } catch (e: EmailAlreadyUsedException) {
+                        return badResponse(
+                            this@pm, setOf(mapOf(
+                                    "objectName" to objectName,
+                                    "field" to EMAIL_FIELD,
+                                    "message" to e.message!!
+                                ))
+                        )
+//                            return badRequest().body(
+//                                forStatus(BAD_REQUEST).apply {
+//                                    type = URI(this@pm.type)
+//                                    title = this@pm.title
+//                                    status = BAD_REQUEST.value()
+//                                    setProperty("path", path)
+//                                    setProperty("message", this@pm.message)
+//                                    setProperty("fieldErrors", this@pm.fieldErrors.apply {
+//                                        add(
+//                                            mapOf(
+//                                                "objectName" to objectName,
+//                                                "field" to EMAIL_FIELD,
+//                                                "message" to e.message!!
+//                                            )
+//                                        )
+//                                    })
+//                                }
+//                            )
                     }
-
                 }
-            }
 
-            signupService.signup(this)
-            ResponseEntity<ProblemDetail>(CREATED)
+            }
         }
+
+        signupService.signup(this)
+        ResponseEntity<ProblemDetail>(CREATED)
+    }
 
     private fun badResponse(
         problemsModel: ProblemsModel,
