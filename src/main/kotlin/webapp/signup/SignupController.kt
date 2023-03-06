@@ -1,15 +1,10 @@
 package webapp.signup
 
-import jakarta.validation.ConstraintViolation
-import jakarta.validation.Validation.byProvider
-import org.hibernate.validator.HibernateValidator
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE
 import org.springframework.http.ProblemDetail
-import org.springframework.http.ProblemDetail.forStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.http.ResponseEntity.badRequest
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ServerWebExchange
 import webapp.Constants.ACCOUNT_API
@@ -20,15 +15,17 @@ import webapp.Constants.SIGNUP_API
 import webapp.Logging.i
 import webapp.ProblemsModel
 import webapp.accounts.entities.AccountRecord.Companion.EMAIL_FIELD
-import webapp.accounts.entities.AccountRecord.Companion.FIRST_NAME_FIELD
-import webapp.accounts.entities.AccountRecord.Companion.LAST_NAME_FIELD
 import webapp.accounts.entities.AccountRecord.Companion.LOGIN_FIELD
-import webapp.accounts.entities.AccountRecord.Companion.PASSWORD_FIELD
 import webapp.accounts.exceptions.EmailAlreadyUsedException
 import webapp.accounts.exceptions.UsernameAlreadyUsedException
 import webapp.accounts.models.AccountCredentials
 import webapp.accounts.models.AccountCredentials.Companion.objectName
-import java.net.URI
+import webapp.signup.SignupUtils.badResponse
+import webapp.signup.SignupUtils.emailAvailable
+import webapp.signup.SignupUtils.emailIsNotAvailable
+import webapp.signup.SignupUtils.loginAvailable
+import webapp.signup.SignupUtils.loginIsNotAvailable
+import webapp.signup.SignupUtils.signupChecks
 import java.util.*
 import java.util.Locale.*
 
@@ -62,15 +59,34 @@ class SignupController(private val signupService: SignupService) {
         @RequestBody account: AccountCredentials,
         exchange: ServerWebExchange
     ): ResponseEntity<ProblemDetail> = account.run acc@{
-        signupChecks(this@acc, exchange).run {
+        exchange.signupChecks(this).run {
             when {
-                isNotEmpty() -> return badResponse(problemsModel, this)
+                isNotEmpty() -> return problemsModel.badResponse(this)
                 else -> try {
-                    loginAvailable(this@acc)
-                    emailAvailable(this@acc)
+                    if (loginIsNotAvailable) return problemsModel.badResponse(
+                        setOf(
+                            mapOf(
+                                "objectName" to objectName,
+                                "field" to LOGIN_FIELD,
+                                "message" to "Login name already used!"
+                            )
+                        )
+                    )
+                    if (emailIsNotAvailable) return problemsModel.badResponse(
+                        setOf(
+                            mapOf(
+                                "objectName" to objectName,
+                                "field" to EMAIL_FIELD,
+                                "message" to "Email is already in use!"
+                            )
+                        )
+                    )
+
+                    loginAvailable(signupService)
+                    emailAvailable(signupService)
                 } catch (e: UsernameAlreadyUsedException) {
-                    return badResponse(
-                        problemsModel, setOf(
+                    return problemsModel.badResponse(
+                        setOf(
                             mapOf(
                                 "objectName" to objectName,
                                 "field" to LOGIN_FIELD,
@@ -79,8 +95,8 @@ class SignupController(private val signupService: SignupService) {
                         )
                     )
                 } catch (e: EmailAlreadyUsedException) {
-                    return badResponse(
-                        problemsModel, setOf(
+                    return problemsModel.badResponse(
+                        setOf(
                             mapOf(
                                 "objectName" to objectName,
                                 "field" to EMAIL_FIELD,
@@ -93,62 +109,6 @@ class SignupController(private val signupService: SignupService) {
         }
         signupService.signup(this)
         ResponseEntity<ProblemDetail>(CREATED)
-    }
-
-    private fun badResponse(
-        problemsModel: ProblemsModel,
-        fieldErrors: Set<Map<String, String?>>
-    ) = badRequest().body(
-        forStatus(BAD_REQUEST).apply {
-            type = URI(problemsModel.type)
-            title = problemsModel.title
-            status = BAD_REQUEST.value()
-            setProperty("path", problemsModel.path)
-            setProperty("message", problemsModel.message)
-            setProperty("fieldErrors", fieldErrors)
-        }
-    )
-
-    private fun signupChecks(
-        accountCredentials: AccountCredentials,
-        exchange: ServerWebExchange
-    ): Set<Map<String, String?>> {
-        byProvider(HibernateValidator::class.java)
-            .configure()
-            .localeResolver {
-                try {
-                    of(
-                        exchange
-                            .request
-                            .headers
-                            .acceptLanguage
-                            .first()
-                            .range
-                    )
-                } catch (e: Exception) {
-                    ENGLISH
-                }
-            }
-            .buildValidatorFactory()
-            .validator.run {
-                return setOf(
-                    PASSWORD_FIELD,
-                    EMAIL_FIELD,
-                    LOGIN_FIELD,
-                    FIRST_NAME_FIELD,
-                    LAST_NAME_FIELD
-                ).map { field ->
-                    field to validateProperty(accountCredentials, field)
-                }.flatMap { violatedField: Pair<String, MutableSet<ConstraintViolation<AccountCredentials>>> ->
-                    violatedField.second.map {
-                        mapOf<String, String?>(
-                            "objectName" to objectName,
-                            "field" to violatedField.first,
-                            "message" to it.message
-                        )
-                    }
-                }.toSet()
-            }
     }
 
 
@@ -179,23 +139,4 @@ class SignupController(private val signupService: SignupService) {
     }
 
 
-    @Throws(UsernameAlreadyUsedException::class)
-    private suspend fun loginAvailable(model: AccountCredentials) {
-        signupService.accountById(model.login!!).run {
-            when {
-                this != null -> if (!activated) signupService.deleteAccount(toAccount())
-                else throw UsernameAlreadyUsedException()
-            }
-        }
-    }
-
-    @Throws(EmailAlreadyUsedException::class)
-    private suspend fun emailAvailable(model: AccountCredentials) {
-        signupService.accountById(model.email!!).run {
-            when {
-                this != null -> if (!activated) signupService.deleteAccount(toAccount())
-                else throw EmailAlreadyUsedException()
-            }
-        }
-    }
 }
