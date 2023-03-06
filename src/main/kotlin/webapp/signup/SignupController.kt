@@ -64,7 +64,7 @@ class SignupController(private val signupService: SignupService) {
     ): ResponseEntity<ProblemDetail> = account.run acc@{
         signupChecks(exchange, this@acc).run {
             when {
-                isNotEmpty() -> return badResponse(problemsModel, this@run)
+                isNotEmpty() -> return badResponse(problemsModel, this)
                 else -> try {
                     isLoginAvailable(this@acc)
                     isEmailAvailable(this@acc)
