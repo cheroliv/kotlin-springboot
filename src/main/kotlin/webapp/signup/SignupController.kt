@@ -59,47 +59,13 @@ class SignupController(private val signupService: SignupService) {
                 message = "error.validation",
                 status = BAD_REQUEST.value(),
             ).run pm@{
-                byProvider(HibernateValidator::class.java)
-                    .configure()
-                    .localeResolver {
-                        try {
-                            of(
-                                exchange
-                                    .request
-                                    .headers
-                                    .acceptLanguage
-                                    .first()
-                                    .range
-                            )
-                        } catch (e: Exception) {
-                            ENGLISH
-                        }
-                    }
-                    .buildValidatorFactory()
-                    .validator.run {
-                        setOf(
-                            PASSWORD_FIELD,
-                            EMAIL_FIELD,
-                            LOGIN_FIELD,
-                            FIRST_NAME_FIELD,
-                            LAST_NAME_FIELD
-                        ).map { field ->
-                            field to validateProperty(this@acc, field)
-                        }.forEach { violatedField ->
-                            violatedField.second.forEach {
-                                fieldErrors.add(
-                                    mapOf(
-                                        "objectName" to objectName,
-                                        "field" to violatedField.first,
-                                        "message" to it.message
-                                    )
-                                )
-                            }
-                        }
-                    }
 
                 when {
-                    fieldErrors.isNotEmpty() -> {
+                    signupChecks(
+                        exchange,
+                        this@acc,
+                        this
+                    ).isNotEmpty() -> {
                         return badRequest().body(
                             forStatus(BAD_REQUEST).apply {
                                 type = URI(this@pm.type)
@@ -111,54 +77,101 @@ class SignupController(private val signupService: SignupService) {
                             }
                         )
                     }
-                }
-                try {
-                    isLoginAvailable(this@acc)
-                    isEmailAvailable(this@acc)
-                } catch (e: UsernameAlreadyUsedException) {
-                    return badRequest().body(
-                        forStatus(BAD_REQUEST).apply {
-                            type = URI(this@pm.type)
-                            title = this@pm.title
-                            status = BAD_REQUEST.value()
-                            setProperty("path", this@pm.path)
-                            setProperty("message", this@pm.message)
-                            setProperty("fieldErrors", this@pm.fieldErrors.apply {
-                                add(
-                                    mapOf(
-                                        "objectName" to objectName,
-                                        "field" to LOGIN_FIELD,
-                                        "message" to e.message!!
+
+                    else -> try {
+                        isLoginAvailable(this@acc)
+                        isEmailAvailable(this@acc)
+                    } catch (e: UsernameAlreadyUsedException) {
+                        return badRequest().body(
+                            forStatus(BAD_REQUEST).apply {
+                                type = URI(this@pm.type)
+                                title = this@pm.title
+                                status = BAD_REQUEST.value()
+                                setProperty("path", this@pm.path)
+                                setProperty("message", this@pm.message)
+                                setProperty("fieldErrors", this@pm.fieldErrors.apply {
+                                    add(
+                                        mapOf(
+                                            "objectName" to objectName,
+                                            "field" to LOGIN_FIELD,
+                                            "message" to e.message!!
+                                        )
                                     )
-                                )
-                            })
-                        }
-                    )
-                } catch (e: EmailAlreadyUsedException) {
-                    return badRequest().body(
-                        forStatus(BAD_REQUEST).apply {
-                            type = URI(this@pm.type)
-                            title = this@pm.title
-                            status = BAD_REQUEST.value()
-                            setProperty("path", path)
-                            setProperty("message", this@pm.message)
-                            setProperty("fieldErrors", this@pm.fieldErrors.apply {
-                                add(
-                                    mapOf(
-                                        "objectName" to objectName,
-                                        "field" to EMAIL_FIELD,
-                                        "message" to e.message!!
+                                })
+                            }
+                        )
+                    } catch (e: EmailAlreadyUsedException) {
+                        return badRequest().body(
+                            forStatus(BAD_REQUEST).apply {
+                                type = URI(this@pm.type)
+                                title = this@pm.title
+                                status = BAD_REQUEST.value()
+                                setProperty("path", path)
+                                setProperty("message", this@pm.message)
+                                setProperty("fieldErrors", this@pm.fieldErrors.apply {
+                                    add(
+                                        mapOf(
+                                            "objectName" to objectName,
+                                            "field" to EMAIL_FIELD,
+                                            "message" to e.message!!
+                                        )
                                     )
-                                )
-                            })
-                        }
-                    )
+                                })
+                            }
+                        )
+                    }
                 }
             }
             signupService.signup(this)
             ResponseEntity<ProblemDetail>(CREATED)
         }
-    
+
+    private fun signupChecks(
+        exchange: ServerWebExchange,
+        accountCredentials: AccountCredentials,
+        problemsModel: ProblemsModel
+    ): MutableSet<Map<String, String>> {
+        byProvider(HibernateValidator::class.java)
+            .configure()
+            .localeResolver {
+                try {
+                    of(
+                        exchange
+                            .request
+                            .headers
+                            .acceptLanguage
+                            .first()
+                            .range
+                    )
+                } catch (e: Exception) {
+                    ENGLISH
+                }
+            }
+            .buildValidatorFactory()
+            .validator.run {
+                setOf(
+                    PASSWORD_FIELD,
+                    EMAIL_FIELD,
+                    LOGIN_FIELD,
+                    FIRST_NAME_FIELD,
+                    LAST_NAME_FIELD
+                ).map { field ->
+                    field to validateProperty(accountCredentials, field)
+                }.forEach { violatedField ->//TODO:construire au lieu de muter
+                    violatedField.second.forEach {
+                        problemsModel.fieldErrors.add(
+                            mapOf(
+                                "objectName" to objectName,
+                                "field" to violatedField.first,
+                                "message" to it.message
+                            )
+                        )
+                    }
+                }
+                return problemsModel.fieldErrors
+            }
+    }
+
 
     /**
      * `GET  /activate` : activate the signed-up user.
@@ -181,7 +194,9 @@ class SignupController(private val signupService: SignupService) {
                             }
                         }
                 }
-            }) throw SignupException(MSG_WRONG_ACTIVATION_KEY)
+            })
+        //TODO: remplacer un ResponseEntity<ProblemDetail>
+            throw SignupException(MSG_WRONG_ACTIVATION_KEY)
     }
 
 
