@@ -1,5 +1,6 @@
 package webapp.signup
 
+import jakarta.validation.ConstraintViolation
 import jakarta.validation.Validation.byProvider
 import org.hibernate.validator.HibernateValidator
 import org.springframework.http.HttpStatus.BAD_REQUEST
@@ -59,78 +60,81 @@ class SignupController(private val signupService: SignupService) {
                 message = "error.validation",
                 status = BAD_REQUEST.value(),
             ).run pm@{
-
-                when {
-                    signupChecks(
-                        exchange,
-                        this@acc,
-                        this
-                    ).isNotEmpty() -> {
-                        return badRequest().body(
-                            forStatus(BAD_REQUEST).apply {
-                                type = URI(this@pm.type)
-                                title = this@pm.title
-                                status = BAD_REQUEST.value()
-                                setProperty("path", this@pm.path)
-                                setProperty("message", this@pm.message)
-                                setProperty("fieldErrors", this@pm.fieldErrors)
-                            }
-                        )
+                signupChecks(
+                    exchange,
+                    this@acc
+                ).run {
+                    when {
+                        isNotEmpty() -> return badResponse(this@pm, this@run)
+                        else -> try {
+                            isLoginAvailable(this@acc)
+                            isEmailAvailable(this@acc)
+                        } catch (e: UsernameAlreadyUsedException) {
+                            return badRequest().body(
+                                forStatus(BAD_REQUEST).apply {
+                                    type = URI(this@pm.type)
+                                    title = this@pm.title
+                                    status = BAD_REQUEST.value()
+                                    setProperty("path", this@pm.path)
+                                    setProperty("message", this@pm.message)
+                                    setProperty("fieldErrors", this@pm.fieldErrors.apply {
+                                        add(
+                                            mapOf(
+                                                "objectName" to objectName,
+                                                "field" to LOGIN_FIELD,
+                                                "message" to e.message!!
+                                            )
+                                        )
+                                    })
+                                }
+                            )
+                        } catch (e: EmailAlreadyUsedException) {
+                            return badRequest().body(
+                                forStatus(BAD_REQUEST).apply {
+                                    type = URI(this@pm.type)
+                                    title = this@pm.title
+                                    status = BAD_REQUEST.value()
+                                    setProperty("path", path)
+                                    setProperty("message", this@pm.message)
+                                    setProperty("fieldErrors", this@pm.fieldErrors.apply {
+                                        add(
+                                            mapOf(
+                                                "objectName" to objectName,
+                                                "field" to EMAIL_FIELD,
+                                                "message" to e.message!!
+                                            )
+                                        )
+                                    })
+                                }
+                            )
+                        }
                     }
 
-                    else -> try {
-                        isLoginAvailable(this@acc)
-                        isEmailAvailable(this@acc)
-                    } catch (e: UsernameAlreadyUsedException) {
-                        return badRequest().body(
-                            forStatus(BAD_REQUEST).apply {
-                                type = URI(this@pm.type)
-                                title = this@pm.title
-                                status = BAD_REQUEST.value()
-                                setProperty("path", this@pm.path)
-                                setProperty("message", this@pm.message)
-                                setProperty("fieldErrors", this@pm.fieldErrors.apply {
-                                    add(
-                                        mapOf(
-                                            "objectName" to objectName,
-                                            "field" to LOGIN_FIELD,
-                                            "message" to e.message!!
-                                        )
-                                    )
-                                })
-                            }
-                        )
-                    } catch (e: EmailAlreadyUsedException) {
-                        return badRequest().body(
-                            forStatus(BAD_REQUEST).apply {
-                                type = URI(this@pm.type)
-                                title = this@pm.title
-                                status = BAD_REQUEST.value()
-                                setProperty("path", path)
-                                setProperty("message", this@pm.message)
-                                setProperty("fieldErrors", this@pm.fieldErrors.apply {
-                                    add(
-                                        mapOf(
-                                            "objectName" to objectName,
-                                            "field" to EMAIL_FIELD,
-                                            "message" to e.message!!
-                                        )
-                                    )
-                                })
-                            }
-                        )
-                    }
                 }
             }
+
             signupService.signup(this)
             ResponseEntity<ProblemDetail>(CREATED)
         }
 
+    private fun badResponse(
+        problemsModel: ProblemsModel,
+        fieldErrors: Set<Map<String, String?>>
+    ) = badRequest().body(
+        forStatus(BAD_REQUEST).apply {
+            type = URI(problemsModel.type)
+            title = problemsModel.title
+            status = BAD_REQUEST.value()
+            setProperty("path", problemsModel.path)
+            setProperty("message", problemsModel.message)
+            setProperty("fieldErrors", fieldErrors)
+        }
+    )
+
     private fun signupChecks(
         exchange: ServerWebExchange,
-        accountCredentials: AccountCredentials,
-        problemsModel: ProblemsModel
-    ): MutableSet<Map<String, String>> {
+        accountCredentials: AccountCredentials
+    ): Set<Map<String, String?>> {
         byProvider(HibernateValidator::class.java)
             .configure()
             .localeResolver {
@@ -149,7 +153,7 @@ class SignupController(private val signupService: SignupService) {
             }
             .buildValidatorFactory()
             .validator.run {
-                setOf(
+                return setOf(
                     PASSWORD_FIELD,
                     EMAIL_FIELD,
                     LOGIN_FIELD,
@@ -157,18 +161,15 @@ class SignupController(private val signupService: SignupService) {
                     LAST_NAME_FIELD
                 ).map { field ->
                     field to validateProperty(accountCredentials, field)
-                }.forEach { violatedField ->//TODO:construire au lieu de muter
-                    violatedField.second.forEach {
-                        problemsModel.fieldErrors.add(
-                            mapOf(
-                                "objectName" to objectName,
-                                "field" to violatedField.first,
-                                "message" to it.message
-                            )
+                }.flatMap { violatedField: Pair<String, MutableSet<ConstraintViolation<AccountCredentials>>> ->
+                    violatedField.second.map {
+                        mapOf<String, String?>(
+                            "objectName" to objectName,
+                            "field" to violatedField.first,
+                            "message" to it.message
                         )
                     }
-                }
-                return problemsModel.fieldErrors
+                }.toSet()
             }
     }
 
