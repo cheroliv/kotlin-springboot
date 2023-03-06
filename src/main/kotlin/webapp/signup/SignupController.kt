@@ -62,71 +62,35 @@ class SignupController(private val signupService: SignupService) {
         @RequestBody account: AccountCredentials,
         exchange: ServerWebExchange
     ): ResponseEntity<ProblemDetail> = account.run acc@{
-        problemsModel.run pm@{
-            signupChecks(exchange, this@acc).run {
-                when {
-                    isNotEmpty() -> return badResponse(this@pm, this@run)
-                    else -> try {
-                        isLoginAvailable(this@acc)
-                        isEmailAvailable(this@acc)
-                    } catch (e: UsernameAlreadyUsedException) {
-                        return badResponse(
-                            this@pm, setOf(mapOf(
-                                    "objectName" to objectName,
-                                    "field" to LOGIN_FIELD,
-                                    "message" to e.message!!
-                                ))
+        signupChecks(exchange, this@acc).run {
+            when {
+                isNotEmpty() -> return badResponse(problemsModel, this@run)
+                else -> try {
+                    isLoginAvailable(this@acc)
+                    isEmailAvailable(this@acc)
+                } catch (e: UsernameAlreadyUsedException) {
+                    return badResponse(
+                        problemsModel, setOf(
+                            mapOf(
+                                "objectName" to objectName,
+                                "field" to LOGIN_FIELD,
+                                "message" to e.message!!
+                            )
                         )
-//                            return badRequest().body(
-//                                forStatus(BAD_REQUEST).apply {
-//                                    type = URI(this@pm.type)
-//                                    title = this@pm.title
-//                                    status = BAD_REQUEST.value()
-//                                    setProperty("path", this@pm.path)
-//                                    setProperty("message", this@pm.message)
-//                                    setProperty("fieldErrors", this@pm.fieldErrors.apply {
-//                                        add(
-//                                            mapOf(
-//                                                "objectName" to objectName,
-//                                                "field" to LOGIN_FIELD,
-//                                                "message" to e.message!!
-//                                            )
-//                                        )
-//                                    })
-//                                }
-//                            )
-                    } catch (e: EmailAlreadyUsedException) {
-                        return badResponse(
-                            this@pm, setOf(mapOf(
-                                    "objectName" to objectName,
-                                    "field" to EMAIL_FIELD,
-                                    "message" to e.message!!
-                                ))
+                    )
+                } catch (e: EmailAlreadyUsedException) {
+                    return badResponse(
+                        problemsModel, setOf(
+                            mapOf(
+                                "objectName" to objectName,
+                                "field" to EMAIL_FIELD,
+                                "message" to e.message!!
+                            )
                         )
-//                            return badRequest().body(
-//                                forStatus(BAD_REQUEST).apply {
-//                                    type = URI(this@pm.type)
-//                                    title = this@pm.title
-//                                    status = BAD_REQUEST.value()
-//                                    setProperty("path", path)
-//                                    setProperty("message", this@pm.message)
-//                                    setProperty("fieldErrors", this@pm.fieldErrors.apply {
-//                                        add(
-//                                            mapOf(
-//                                                "objectName" to objectName,
-//                                                "field" to EMAIL_FIELD,
-//                                                "message" to e.message!!
-//                                            )
-//                                        )
-//                                    })
-//                                }
-//                            )
-                    }
+                    )
                 }
-
             }
         }
-
         signupService.signup(this)
         ResponseEntity<ProblemDetail>(CREATED)
     }
