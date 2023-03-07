@@ -25,6 +25,5 @@ Open terminal and run : ```./gradlew check```
 Open terminal and run : ```./gradlew bootRun``` +
 and launch http://localhost:8080/
 
-
 ==== **to run the cli**
 Open terminal and run : ```./gradlew cli``` +
