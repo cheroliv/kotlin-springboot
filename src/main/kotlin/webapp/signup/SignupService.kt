@@ -24,7 +24,6 @@ class SignupService(
 ) {
     @Transactional
     suspend fun signup(account: AccountCredentials) = now().run {
-        i("signup attempt: ${this@run} ${account.login} ${account.email}")
         accountRepository.signup(
             account.copy(
                 password = passwordEncoder.encode(account.password),

@@ -18,8 +18,8 @@ import webapp.signup.SignupUtils.badResponseEmailIsNotAvailable
 import webapp.signup.SignupUtils.badResponseLoginIsNotAvailable
 import webapp.signup.SignupUtils.emailIsNotAvailable
 import webapp.signup.SignupUtils.loginIsNotAvailable
-import webapp.signup.SignupUtils.signupChecks
 import webapp.signup.SignupUtils.signupProblems
+import webapp.signup.SignupUtils.validate
 import java.util.*
 import java.util.Locale.*
 
@@ -41,11 +41,11 @@ class SignupController(private val signupService: SignupService) {
     suspend fun signup(
         @RequestBody account: AccountCredentials,
         exchange: ServerWebExchange
-    ): ResponseEntity<ProblemDetail> = account.signupChecks(exchange).run {
-        if (isNotEmpty())
-            return signupProblems.badResponse(this)
-    }.let {
-        return when {
+    ): ResponseEntity<ProblemDetail> = account.validate(exchange).run {
+        i("signup attempt: ${this@run} ${account.login} ${account.email}")
+        if (isNotEmpty()) return signupProblems.badResponse(this)
+    }.run {
+         when {
             account.loginIsNotAvailable(signupService) -> signupProblems.badResponseLoginIsNotAvailable
             account.emailIsNotAvailable(signupService) -> signupProblems.badResponseEmailIsNotAvailable
             else -> {

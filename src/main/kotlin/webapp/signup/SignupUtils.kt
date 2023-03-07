@@ -44,7 +44,7 @@ object SignupUtils {
             .buildValidatorFactory()
             .validator
 
-    fun AccountCredentials.signupChecks(
+    fun AccountCredentials.validate(
         exchange: ServerWebExchange
     ): Set<Map<String, String?>> {
         exchange.validator.run {
@@ -55,7 +55,7 @@ object SignupUtils {
                 FIRST_NAME_FIELD,
                 LAST_NAME_FIELD
             ).map { field ->
-                field to validateProperty(this@signupChecks, field)
+                field to validateProperty(this@validate, field)
             }.flatMap { violatedField ->
                 violatedField.second.map {
                     mapOf<String, String?>(
