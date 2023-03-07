@@ -1,22 +1,22 @@
 @file:Suppress(
     "GradlePackageUpdate",
-    "DEPRECATION",
+    "DEPRECATION", "LocalVariableName",
 )
 
-import AppDeps.appModules
-import GradleUtils.appDependencies
-import GradleUtils.sep
 import org.gradle.api.JavaVersion.VERSION_19
 import org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED
 import org.gradle.api.tasks.testing.logging.TestLogEvent.SKIPPED
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import java.lang.System.getProperty
 
 buildscript {
     repositories {
         gradlePluginPortal()
         google()
     }
-    dependencies { classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.kotlin_version}") }
+    dependencies {
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.10")
+    }
 }
 
 plugins {
@@ -37,23 +37,71 @@ group = properties["artifact.group"].toString()
 version = properties["artifact.version"].toString()
 
 repositories {
-    google()
     mavenCentral()
+    google()
 }
 
 dependencies {
-    testImplementation("org.springframework.boot:spring-boot-starter-test") { exclude(module = "mockito-core") }
-    appDependencies()
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+    implementation("org.jetbrains.kotlin:kotlin-reflect")
+    implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:${properties["kotlinx_serialization_json.version"]}")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+    implementation("org.apache.commons:commons-lang3")
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("org.springframework.boot:spring-boot-starter-mail")
+    implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
+    implementation("com.mailslurp:mailslurp-client-kotlin:${properties["mailslurp-client-kotlin.version"]}")
+    implementation("org.springframework.boot:spring-boot-starter-validation")
+    implementation("org.springframework.boot:spring-boot-starter-webflux")
+    implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
+    implementation("org.springframework.boot:spring-boot-starter-security")
+    implementation("org.springframework.security:spring-security-data")
+    implementation("io.jsonwebtoken:jjwt-impl:${properties["jsonwebtoken.version"]}")
+    implementation("io.jsonwebtoken:jjwt-jackson:${properties["jsonwebtoken.version"]}")
+    implementation("io.netty:netty-tcnative-boringssl-static:${properties["boring_ssl.version"]}")
+
+    //    implementation("org.springframework.cloud:spring-cloud-gcp-starter-storage")
+    //    implementation("io.projectreactor.tools:blockhound:${properties["blockhound_version"]}")
+
+
+    runtimeOnly("org.springframework.boot:spring-boot-properties-migrator")
+    runtimeOnly("com.h2database:h2")
+    runtimeOnly("io.r2dbc:r2dbc-h2")
+    //        //    runtimeOnly ("com.google.appengine:appengine:+")
+    //        //    runtimeOnly("io.r2dbc:r2dbc-postgresql")
+    //        //    runtimeOnly("org.postgresql:postgresql")
+
+    testImplementation("org.jetbrains.kotlin:kotlin-test")
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
+    testImplementation("org.springframework.boot:spring-boot-starter-test") {
+        exclude(module = "mockito-core")
+    }
+    testImplementation("io.projectreactor:reactor-test")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:${properties["mockito_kotlin_version"]}")
+    testImplementation("io.mockk:mockk:${properties["mockk.version"]}")
+    testImplementation("com.github.tomakehurst:wiremock-jre8:${properties["wiremock.version"]}")
+    testImplementation("com.ninja-squad:springmockk:${properties["springmockk.version"]}")
+    //        //    testImplementation("io.projectreactor.tools:blockhound-junit-platform" to "blockhound_version"]}")
+    //    "org.testcontainers:junit-jupiter")
+    //    "org.testcontainers:postgresql")
+    //    "org.testcontainers:r2dbc")
+    //    "com.tngtech.archunit:archunit-junit5-api" to "archunit_junit5_version")
+    //     "org.springframework.cloud:spring-cloud-starter-contract-verifier")
+//    testRuntimeOnly("com.tngtech.archunit:archunit-junit5-engine:${properties["archunit_junit5_version"]}")
+    developmentOnly("org.springframework.boot:spring-boot-devtools")
+    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 }
 
 configurations {
     compileOnly { extendsFrom(configurations.annotationProcessor.get()) }
     implementation.configure {
-        appModules
-            .first { it.first == AppDeps.implementation }
-            .second
-            .second
-            ?.forEach { exclude(it.first, it.second) }
+        setOf(
+            "org.junit.vintage" to "junit-vintage-engine",
+            "org.springframework.boot" to "spring-boot-starter-tomcat",
+            "org.apache.tomcat" to null
+        ).forEach { exclude(it.first, it.second) }
     }
 }
 
@@ -79,6 +127,8 @@ tasks.withType<Test> {
         ignoreFailures = true
     }
 }
+
+val Project.sep: String  get() = getProperty("file.separator")
 
 tasks.register<Delete>("cleanResources") {
     description = "Delete directory build/resources"
@@ -156,37 +206,5 @@ jib {
 //            username = properties["docker_hub_email"].toString()
 //            password = properties["docker_hub_password"].toString()
 //        }
-    }
-}
-
-fun Project.appDependenciesToString(): Set<Pair<String, Pair<Set<Triple<String, String, Set<Map<String, String>>?>>, Set<Pair<String, String?>>?>>> {
-//    appModules.forEach { module ->
-//        module.second.first.forEach { dep ->
-//            mapOf(dep.first to dep.second).entries.first().run {
-////                dependencies.add(module.first, dependency(this))
-//                println(module.first+ " "+this)
-////                    dependencies.module(dependency(this)) {
-////                        dep.third?.forEach { excl ->
-////                            excl.forEach { (group, name) ->
-////                                if (name != null && group.isNotBlank() && name.isNotBlank())
-////                                    exclude(mapOf(group to name))
-////                                if (group.isNotBlank())
-////                                    exclude(mapOf(group to BLANK))
-////                                if (!name.isNullOrBlank())
-////                                    exclude(mapOf(BLANK to name))
-////                            }
-////                        }
-////                    }
-//            }
-//        }
-//    }
-    return appModules
-}
-
-tasks.register("testDependencies") {
-    description = "Test gradle project extension project."
-    group = "application"
-    doLast{
-        println(appDependenciesToString())
     }
 }
