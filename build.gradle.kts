@@ -6,7 +6,6 @@
 import AppDeps.appModules
 import GradleUtils.appDependencies
 import GradleUtils.sep
-//import org.gradle.api.JavaVersion.VERSION_8
 import org.gradle.api.JavaVersion.VERSION_19
 import org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED
 import org.gradle.api.tasks.testing.logging.TestLogEvent.SKIPPED
@@ -157,5 +156,37 @@ jib {
 //            username = properties["docker_hub_email"].toString()
 //            password = properties["docker_hub_password"].toString()
 //        }
+    }
+}
+
+fun Project.appDependenciesToString(): Set<Pair<String, Pair<Set<Triple<String, String, Set<Map<String, String>>?>>, Set<Pair<String, String?>>?>>> {
+//    appModules.forEach { module ->
+//        module.second.first.forEach { dep ->
+//            mapOf(dep.first to dep.second).entries.first().run {
+////                dependencies.add(module.first, dependency(this))
+//                println(module.first+ " "+this)
+////                    dependencies.module(dependency(this)) {
+////                        dep.third?.forEach { excl ->
+////                            excl.forEach { (group, name) ->
+////                                if (name != null && group.isNotBlank() && name.isNotBlank())
+////                                    exclude(mapOf(group to name))
+////                                if (group.isNotBlank())
+////                                    exclude(mapOf(group to BLANK))
+////                                if (!name.isNullOrBlank())
+////                                    exclude(mapOf(BLANK to name))
+////                            }
+////                        }
+////                    }
+//            }
+//        }
+//    }
+    return appModules
+}
+
+tasks.register("testDependencies") {
+    description = "Test gradle project extension project."
+    group = "application"
+    doLast{
+        println(appDependenciesToString())
     }
 }

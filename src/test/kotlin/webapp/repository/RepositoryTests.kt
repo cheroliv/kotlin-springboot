@@ -16,7 +16,8 @@ import webapp.Constants.ROLE_USER
 import webapp.Constants.SYSTEM_USER
 import webapp.DataTests.accounts
 import webapp.DataTests.defaultAccount
-import webapp.accounts.models.AccountUtils.generateActivationKeyimport webapp.accounts.models.toAccount
+import webapp.accounts.models.AccountUtils.generateActivationKey
+import webapp.accounts.models.toAccount
 import webapp.accounts.repository.AccountRepository
 import webapp.accounts.repository.AccountRepositoryR2dbc
 import java.time.Instant
