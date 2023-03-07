@@ -35,6 +35,6 @@ data class Account(
     val lastModifiedBy: String? = null,
     val lastModifiedDate: Instant? = null,
     val authorities: Set<String>? = null
-) {
-    fun isActivated(): Boolean = activated
-}
+)
+
+fun Account.isActivated(): Boolean = activated

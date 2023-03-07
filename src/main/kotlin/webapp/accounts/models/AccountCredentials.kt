@@ -61,24 +61,25 @@ data class AccountCredentials(
         authorities = account.authorities?.map { it }?.toMutableSet()
     )
 
-
-    fun toAccount(): Account = Account(
-        id = id,
-        login = login,
-        firstName = firstName,
-        lastName = lastName,
-        email = email,
-        activated = activated,
-        langKey = langKey,
-        createdBy = createdBy,
-        createdDate = createdDate,
-        lastModifiedBy = lastModifiedBy,
-        lastModifiedDate = lastModifiedDate,
-        authorities = authorities
-    )
-
     companion object {
         @JvmStatic
         val objectName = AccountCredentials::class.java.simpleName.objectName
     }
 }
+
+
+fun AccountCredentials.toAccount(): Account = Account(
+    id = id,
+    login = login,
+    firstName = firstName,
+    lastName = lastName,
+    email = email,
+    activated = activated,
+    langKey = langKey,
+    createdBy = createdBy,
+    createdDate = createdDate,
+    lastModifiedBy = lastModifiedBy,
+    lastModifiedDate = lastModifiedDate,
+    authorities = authorities
+)
+

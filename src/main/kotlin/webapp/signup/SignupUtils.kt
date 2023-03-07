@@ -17,6 +17,7 @@ import webapp.accounts.entities.AccountRecord.Companion.LOGIN_FIELD
 import webapp.accounts.entities.AccountRecord.Companion.PASSWORD_FIELD
 import webapp.accounts.models.AccountCredentials
 import webapp.accounts.models.AccountCredentials.Companion.objectName
+import webapp.accounts.models.toAccount
 import java.net.URI
 import java.util.Locale.ENGLISH
 import java.util.Locale.of
