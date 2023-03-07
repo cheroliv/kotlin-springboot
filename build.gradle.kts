@@ -33,7 +33,7 @@ plugins {
     id("com.github.andygoossens.gradle-modernizer-plugin")
 }
 
-springBoot.mainClass.set("webapp.Application")
+springBoot.mainClass.set("webapp.ApplicationKt")
 
 tasks.register("cli") {
     group = "application"
