@@ -42,15 +42,19 @@ class SignupController(private val signupService: SignupService) {
     suspend fun signup(
         @RequestBody account: AccountCredentials,
         exchange: ServerWebExchange
-    ): ResponseEntity<ProblemDetail> = account.validate(exchange).run {
-        i("signup attempt: ${this@run} ${account.login} ${account.email}")
-        if (isNotEmpty()) return signupProblems.badResponse(this)
-    }.run {
-        when {
+    ): ResponseEntity<ProblemDetail> {
+        i("signup attempt: ${account.login} ${account.email}")
+        val errors = account.validate(exchange)
+        return when {
+            errors.isNotEmpty() -> signupProblems.badResponse(errors)
             account.loginIsNotAvailable(signupService) -> signupProblems.badResponseLoginIsNotAvailable
             account.emailIsNotAvailable(signupService) -> signupProblems.badResponseEmailIsNotAvailable
             else -> {
-                signupService.signup(account)
+                try {
+                    signupService.signup(account)
+                } catch (_: Exception) {
+                    return internalServerError().build()
+                }
                 ResponseEntity<ProblemDetail>(CREATED)
             }
         }
@@ -83,7 +87,7 @@ class SignupController(private val signupService: SignupService) {
                             activationKey = null
                         )
                     )
-                }catch (_:Exception){
+                } catch (_: Exception) {
                     return internalServerError().build()
                 }
                 return ok().build()
