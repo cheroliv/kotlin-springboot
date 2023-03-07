@@ -7,7 +7,9 @@ import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.ProblemDetail.forStatus
 import org.springframework.http.ResponseEntity.badRequest
 import org.springframework.web.server.ServerWebExchange
+import webapp.Constants
 import webapp.ProblemsModel
+import webapp.ProblemsModel.Companion.defaultProblems
 import webapp.accounts.entities.AccountRecord.Companion.EMAIL_FIELD
 import webapp.accounts.entities.AccountRecord.Companion.FIRST_NAME_FIELD
 import webapp.accounts.entities.AccountRecord.Companion.LAST_NAME_FIELD
@@ -21,6 +23,8 @@ import java.util.Locale.of
 
 
 object SignupUtils {
+    val signupProblems = defaultProblems.copy(path = "${Constants.ACCOUNT_API}${Constants.SIGNUP_API}")
+
     private val ServerWebExchange.validator: Validator
         get() = Validation.byProvider(HibernateValidator::class.java)
             .configure()

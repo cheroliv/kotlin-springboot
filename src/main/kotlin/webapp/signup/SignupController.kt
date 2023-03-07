@@ -12,7 +12,6 @@ import webapp.Constants.ACTIVATE_API_KEY
 import webapp.Constants.MSG_WRONG_ACTIVATION_KEY
 import webapp.Constants.SIGNUP_API
 import webapp.Logging.i
-import webapp.ProblemsModel.Companion.defaultProblems
 import webapp.accounts.models.AccountCredentials
 import webapp.signup.SignupUtils.badResponse
 import webapp.signup.SignupUtils.badResponseEmailIsNotAvailable
@@ -20,16 +19,13 @@ import webapp.signup.SignupUtils.badResponseLoginIsNotAvailable
 import webapp.signup.SignupUtils.emailIsNotAvailable
 import webapp.signup.SignupUtils.loginIsNotAvailable
 import webapp.signup.SignupUtils.signupChecks
+import webapp.signup.SignupUtils.signupProblems
 import java.util.*
 import java.util.Locale.*
 
 @RestController
 @RequestMapping(ACCOUNT_API)
 class SignupController(private val signupService: SignupService) {
-
-    companion object {
-        val signupProblems = defaultProblems.copy(path = "$ACCOUNT_API$SIGNUP_API")
-    }
 
     internal class SignupException(message: String) : RuntimeException(message)
 
@@ -48,7 +44,7 @@ class SignupController(private val signupService: SignupService) {
     ): ResponseEntity<ProblemDetail> = account.signupChecks(exchange).run {
         if (isNotEmpty())
             return signupProblems.badResponse(this)
-    }.run {
+    }.let {
         return when {
             account.loginIsNotAvailable(signupService) -> signupProblems.badResponseLoginIsNotAvailable
             account.emailIsNotAvailable(signupService) -> signupProblems.badResponseEmailIsNotAvailable
