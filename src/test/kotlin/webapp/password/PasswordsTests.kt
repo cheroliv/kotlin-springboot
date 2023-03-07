@@ -47,6 +47,8 @@ internal class PasswordControllerTests {
     @Test
     fun `test Change Password Wrong Existing Password`() {
         i("test Change Password Wrong Existing Password")
+        //TODO: activate account
+        //TODO: get bearer by login
     }
     /*
         @Test
