@@ -16,6 +16,7 @@ import webapp.accounts.entities.AccountRecord.Companion.PASSWORD_FIELD
 import webapp.accounts.exceptions.EmailAlreadyUsedException
 import webapp.accounts.exceptions.UsernameAlreadyUsedException
 import webapp.accounts.models.AccountCredentials
+import webapp.accounts.models.AccountCredentials.Companion.objectName
 import java.net.URI
 import java.util.*
 import java.util.Locale.ENGLISH
@@ -41,7 +42,9 @@ object SignupUtils {
             .buildValidatorFactory()
             .validator
 
-    fun ServerWebExchange.signupChecks(accountCredentials: AccountCredentials): Set<Map<String, String?>> {
+    fun ServerWebExchange.signupChecks(
+        accountCredentials: AccountCredentials
+    ): Set<Map<String, String?>> {
         validator.run {
             return setOf(
                 PASSWORD_FIELD,
@@ -54,7 +57,7 @@ object SignupUtils {
             }.flatMap { violatedField ->
                 violatedField.second.map {
                     mapOf<String, String?>(
-                        "objectName" to AccountCredentials.objectName,
+                        "objectName" to objectName,
                         "field" to violatedField.first,
                         "message" to it.message
                     )
@@ -62,6 +65,7 @@ object SignupUtils {
             }.toSet()
         }
     }
+
     fun ProblemsModel.badResponse(
         fieldErrors: Set<Map<String, String?>>
     ) = badRequest().body(
@@ -75,10 +79,10 @@ object SignupUtils {
         }
     )
 
-     val AccountCredentials.emailIsNotAvailable: Boolean
+    val AccountCredentials.emailIsNotAvailable: Boolean
         get() = false
 
-     val AccountCredentials.loginIsNotAvailable: Boolean
+    val AccountCredentials.loginIsNotAvailable: Boolean
         get() = false
 
     @Throws(UsernameAlreadyUsedException::class)

@@ -59,10 +59,12 @@ class SignupController(private val signupService: SignupService) {
         @RequestBody account: AccountCredentials,
         exchange: ServerWebExchange
     ): ResponseEntity<ProblemDetail> = account.run acc@{
+        //TODO: inverser les type de l'extension function
         exchange.signupChecks(this).run {
             when {
                 isNotEmpty() -> return problemsModel.badResponse(this)
                 else -> try {
+                    //TODO: problemsModel.badResponseLoginIsNotAvailable
                     if (loginIsNotAvailable) return problemsModel.badResponse(
                         setOf(
                             mapOf(
@@ -72,6 +74,7 @@ class SignupController(private val signupService: SignupService) {
                             )
                         )
                     )
+                    //TODO: problemsModel.badResponseEmailIsNotAvailable
                     if (emailIsNotAvailable) return problemsModel.badResponse(
                         setOf(
                             mapOf(
