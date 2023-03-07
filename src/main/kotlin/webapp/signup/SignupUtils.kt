@@ -44,7 +44,7 @@ object SignupUtils {
             .validator
 
     fun AccountCredentials.signupChecks(
-        exchange:ServerWebExchange
+        exchange: ServerWebExchange
     ): Set<Map<String, String?>> {
         exchange.validator.run {
             return setOf(
@@ -91,27 +91,47 @@ object SignupUtils {
             )
         )
     val ProblemsModel.badResponseEmailIsNotAvailable
-        get() = badResponse(setOf(
-            mapOf(
-                "objectName" to objectName,
-                "field" to EMAIL_FIELD,
-                "message" to "Email is already in use!"
+        get() = badResponse(
+            setOf(
+                mapOf(
+                    "objectName" to objectName,
+                    "field" to EMAIL_FIELD,
+                    "message" to "Email is already in use!"
+                )
             )
-        ))
+        )
 
 
+    suspend fun AccountCredentials.loginIsNotAvailable(signupService: SignupService) =
+        signupService.accountById(login!!).run {
+            if (this == null) false
+            when {
+                !activated -> false.apply {
+                    signupService.deleteAccount(toAccount())
+                }
 
-    val AccountCredentials.emailIsNotAvailable: Boolean
-        get() = false
+                else -> true
+            }
+        }
 
-    val AccountCredentials.loginIsNotAvailable: Boolean
-        get() = false
+    suspend fun AccountCredentials.emailIsNotAvailable(signupService: SignupService) =
+        signupService.accountById(email!!).run {
+            if (this == null) false
+            when {
+                !activated -> false.apply {
+                    signupService.deleteAccount(toAccount())
+                }
+
+                else -> true
+            }
+        }
+
 
     @Throws(UsernameAlreadyUsedException::class)
     suspend fun AccountCredentials.loginAvailable(signupService: SignupService) {
         signupService.accountById(login!!).run {
-            when {
-                this != null -> if (!activated) signupService.deleteAccount(toAccount())
+            if (this != null) {
+                if (!activated) signupService.deleteAccount(toAccount())
                 else throw UsernameAlreadyUsedException()
             }
         }

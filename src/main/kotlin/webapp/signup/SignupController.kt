@@ -20,12 +20,8 @@ import webapp.accounts.exceptions.UsernameAlreadyUsedException
 import webapp.accounts.models.AccountCredentials
 import webapp.accounts.models.AccountCredentials.Companion.objectName
 import webapp.signup.SignupUtils.badResponse
-import webapp.signup.SignupUtils.badResponseEmailIsNotAvailable
-import webapp.signup.SignupUtils.badResponseLoginIsNotAvailable
 import webapp.signup.SignupUtils.emailAvailable
-import webapp.signup.SignupUtils.emailIsNotAvailable
 import webapp.signup.SignupUtils.loginAvailable
-import webapp.signup.SignupUtils.loginIsNotAvailable
 import webapp.signup.SignupUtils.signupChecks
 import java.util.*
 import java.util.Locale.*
@@ -59,8 +55,8 @@ class SignupController(private val signupService: SignupService) {
                 when {
                     isNotEmpty() -> return signupProblems.badResponse(this)
                     else -> try {
-                        if (loginIsNotAvailable) return signupProblems.badResponseLoginIsNotAvailable
-                        if (emailIsNotAvailable) return signupProblems.badResponseEmailIsNotAvailable
+//                        if (loginIsNotAvailable(signupService)) return signupProblems.badResponseLoginIsNotAvailable
+//                        if (emailIsNotAvailable(signupService)) return signupProblems.badResponseEmailIsNotAvailable
                         loginAvailable(signupService)
                         emailAvailable(signupService)
                     } catch (e: UsernameAlreadyUsedException) {
