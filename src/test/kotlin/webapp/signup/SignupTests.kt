@@ -495,7 +495,7 @@ internal class SignupTests {
             .exchange()
             .expectStatus()
             .is5xxServerError
-            .returnResult<Unit>()
+            .returnResult<ProblemDetail>()
     }
 
     @Test
@@ -517,7 +517,7 @@ internal class SignupTests {
             ).exchange()
             .expectStatus()
             .isOk
-            .returnResult<Unit>()
+            .returnResult<ProblemDetail>()
 
         findOneByLogin(defaultAccount.login!!, dao)!!.run {
             assertNull(activationKey)
@@ -532,7 +532,7 @@ internal class SignupTests {
                 .get()
                 .uri("$ACTIVATE_API_PATH$ACTIVATE_API_PARAM", this)
                 .exchange()
-                .returnResult<Unit>()
+                .returnResult<ProblemDetail>()
                 .url
                 .let { assertEquals(URI("$BASE_URL_DEV$ACTIVATE_API_PATH$this"), it) }
         }

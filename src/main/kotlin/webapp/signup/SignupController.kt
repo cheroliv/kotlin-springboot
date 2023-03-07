@@ -4,12 +4,13 @@ import org.springframework.http.HttpStatus.CREATED
 import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE
 import org.springframework.http.ProblemDetail
 import org.springframework.http.ResponseEntity
+import org.springframework.http.ResponseEntity.internalServerError
+import org.springframework.http.ResponseEntity.ok
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ServerWebExchange
 import webapp.Constants.ACCOUNT_API
 import webapp.Constants.ACTIVATE_API
 import webapp.Constants.ACTIVATE_API_KEY
-import webapp.Constants.MSG_WRONG_ACTIVATION_KEY
 import webapp.Constants.SIGNUP_API
 import webapp.Logging.i
 import webapp.accounts.models.AccountCredentials
@@ -45,7 +46,7 @@ class SignupController(private val signupService: SignupService) {
         i("signup attempt: ${this@run} ${account.login} ${account.email}")
         if (isNotEmpty()) return signupProblems.badResponse(this)
     }.run {
-         when {
+        when {
             account.loginIsNotAvailable(signupService) -> signupProblems.badResponseLoginIsNotAvailable
             account.emailIsNotAvailable(signupService) -> signupProblems.badResponseEmailIsNotAvailable
             else -> {
@@ -60,27 +61,33 @@ class SignupController(private val signupService: SignupService) {
      * `GET  /activate` : activate the signed-up user.
      *
      * @param key the activation key.
-     * @throws RuntimeException `500 (Internal Application Error)` if the user couldn't be activated.
+     * @return ResponseEntity<ProblemDetail> `500 (Internal Application Error)` if the user couldn't be activated.
      */
+    //TODO: Problem avec model et message i18n
     @GetMapping(ACTIVATE_API)
-    @Throws(SignupException::class)
-    suspend fun activateAccount(@RequestParam(ACTIVATE_API_KEY) key: String) {
-        if (!signupService.accountByActivationKey(key).run no@{
-                return@no when {
-                    this == null -> false.apply { i("no activation for key: $key") }
-                    else -> signupService
-                        .saveAccount(copy(activated = true, activationKey = null))
-                        .run yes@{
-                            return@yes when {
-                                this != null -> true.apply { i("activation: $login") }
-                                else -> false
-                            }
-                        }
+    suspend fun activateAccount(
+        @RequestParam(ACTIVATE_API_KEY) key: String
+    ): ResponseEntity<ProblemDetail> {
+        when (val account = signupService.accountByActivationKey(key)) {
+            null -> {
+                i("no activation for key: $key")//MSG_WRONG_ACTIVATION_KEY
+                return internalServerError().build()
+            }
+
+            else -> {
+                i("activation: ${account.login}")
+                try {
+                    signupService.saveAccount(
+                        account.copy(
+                            activated = true,
+                            activationKey = null
+                        )
+                    )
+                }catch (_:Exception){
+                    return internalServerError().build()
                 }
-            })
-        //TODO: remplacer un ResponseEntity<ProblemDetail>
-            throw SignupException(MSG_WRONG_ACTIVATION_KEY)
+                return ok().build()
+            }
+        }
     }
-
-
 }

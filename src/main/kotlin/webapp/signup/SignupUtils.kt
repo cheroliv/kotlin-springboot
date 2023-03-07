@@ -1,6 +1,6 @@
 package webapp.signup
 
-import jakarta.validation.Validation
+import jakarta.validation.Validation.byProvider
 import jakarta.validation.Validator
 import org.hibernate.validator.HibernateValidator
 import org.springframework.http.HttpStatus.BAD_REQUEST
@@ -27,7 +27,7 @@ object SignupUtils {
     val signupProblems = defaultProblems.copy(path = "${Constants.ACCOUNT_API}${Constants.SIGNUP_API}")
 
     private val ServerWebExchange.validator: Validator
-        get() = Validation.byProvider(HibernateValidator::class.java)
+        get() = byProvider(HibernateValidator::class.java)
             .configure()
             .localeResolver {
                 try {
