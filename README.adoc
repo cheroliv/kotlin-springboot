@@ -10,11 +10,13 @@
 * spring security jwt
 * kotlin coroutines
 * Http problem details
+* cli: command line interface
 
 .features:
 * Signup account
 * Password reset and update
 * Account management
+
 
 ==== **to test the app**
 Open terminal and run : ```./gradlew check```
@@ -22,3 +24,7 @@ Open terminal and run : ```./gradlew check```
 ==== **to run the app**
 Open terminal and run : ```./gradlew bootRun``` +
 and launch http://localhost:8080/
+
+
+==== **to run the cli**
+Open terminal and run : ```./gradlew cli``` +
