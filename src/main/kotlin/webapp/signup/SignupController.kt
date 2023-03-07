@@ -45,14 +45,18 @@ class SignupController(private val signupService: SignupService) {
     suspend fun signup(
         @RequestBody account: AccountCredentials,
         exchange: ServerWebExchange
-    ): ResponseEntity<ProblemDetail> {
-        account.signupChecks(exchange).run {
-            if (isNotEmpty()) return signupProblems.badResponse(this)
+    ): ResponseEntity<ProblemDetail> = account.signupChecks(exchange).run {
+        if (isNotEmpty())
+            return signupProblems.badResponse(this)
+    }.run {
+        return when {
+            account.loginIsNotAvailable(signupService) -> signupProblems.badResponseLoginIsNotAvailable
+            account.emailIsNotAvailable(signupService) -> signupProblems.badResponseEmailIsNotAvailable
+            else -> {
+                signupService.signup(account)
+                ResponseEntity<ProblemDetail>(CREATED)
+            }
         }
-        if (account.loginIsNotAvailable(signupService)) return signupProblems.badResponseLoginIsNotAvailable
-        if (account.emailIsNotAvailable(signupService)) return signupProblems.badResponseEmailIsNotAvailable
-        signupService.signup(account)
-        return ResponseEntity<ProblemDetail>(CREATED)
     }
 
 
