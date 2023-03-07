@@ -1,10 +1,13 @@
 package webapp
 
+import org.springframework.http.HttpStatus.BAD_REQUEST
+
+
 data class ProblemsModel(
     val type: String,
     val title: String,
     val status: Int,
-    val path: String,
+    val path: String = "",
     val message: String,
     val fieldErrors: MutableSet<Map<String, String>> = mutableSetOf()
 ) {
@@ -17,6 +20,13 @@ data class ProblemsModel(
             PROBLEM_OBJECT_NAME,
             PROBLEM_FIELD,
             PROBLEM_MESSAGE
+        )
+        val defaultProblems = ProblemsModel(
+            type = "https://cheroliv.github.io/problem/constraint-violation",
+            title = "Data binding and validation failure",
+            message = "error.validation",
+            path = "",
+            status = BAD_REQUEST.value(),
         )
     }
 }

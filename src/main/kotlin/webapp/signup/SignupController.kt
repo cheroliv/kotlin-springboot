@@ -1,6 +1,5 @@
 package webapp.signup
 
-import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE
 import org.springframework.http.ProblemDetail
@@ -13,7 +12,7 @@ import webapp.Constants.ACTIVATE_API_KEY
 import webapp.Constants.MSG_WRONG_ACTIVATION_KEY
 import webapp.Constants.SIGNUP_API
 import webapp.Logging.i
-import webapp.ProblemsModel
+import webapp.ProblemsModel.Companion.defaultProblems
 import webapp.accounts.entities.AccountRecord.Companion.EMAIL_FIELD
 import webapp.accounts.entities.AccountRecord.Companion.LOGIN_FIELD
 import webapp.accounts.exceptions.EmailAlreadyUsedException
@@ -34,13 +33,7 @@ import java.util.Locale.*
 class SignupController(private val signupService: SignupService) {
 
     companion object {
-        val problemsModel = ProblemsModel(
-            type = "https://cheroliv.github.io/problem/constraint-violation",
-            title = "Data binding and validation failure",
-            path = "$ACCOUNT_API$SIGNUP_API",
-            message = "error.validation",
-            status = BAD_REQUEST.value(),
-        )
+        val signupProblems = defaultProblems.copy(path = "$ACCOUNT_API$SIGNUP_API")
     }
 
     internal class SignupException(message: String) : RuntimeException(message)
@@ -62,10 +55,10 @@ class SignupController(private val signupService: SignupService) {
         //TODO: inverser les type de l'extension function
         exchange.signupChecks(this).run {
             when {
-                isNotEmpty() -> return problemsModel.badResponse(this)
+                isNotEmpty() -> return signupProblems.badResponse(this)
                 else -> try {
                     //TODO: problemsModel.badResponseLoginIsNotAvailable
-                    if (loginIsNotAvailable) return problemsModel.badResponse(
+                    if (loginIsNotAvailable) return signupProblems.badResponse(
                         setOf(
                             mapOf(
                                 "objectName" to objectName,
@@ -75,7 +68,7 @@ class SignupController(private val signupService: SignupService) {
                         )
                     )
                     //TODO: problemsModel.badResponseEmailIsNotAvailable
-                    if (emailIsNotAvailable) return problemsModel.badResponse(
+                    if (emailIsNotAvailable) return signupProblems.badResponse(
                         setOf(
                             mapOf(
                                 "objectName" to objectName,
@@ -88,7 +81,7 @@ class SignupController(private val signupService: SignupService) {
                     loginAvailable(signupService)
                     emailAvailable(signupService)
                 } catch (e: UsernameAlreadyUsedException) {
-                    return problemsModel.badResponse(
+                    return signupProblems.badResponse(
                         setOf(
                             mapOf(
                                 "objectName" to objectName,
@@ -98,7 +91,7 @@ class SignupController(private val signupService: SignupService) {
                         )
                     )
                 } catch (e: EmailAlreadyUsedException) {
-                    return problemsModel.badResponse(
+                    return signupProblems.badResponse(
                         setOf(
                             mapOf(
                                 "objectName" to objectName,
