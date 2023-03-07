@@ -33,6 +33,19 @@ plugins {
     id("com.github.andygoossens.gradle-modernizer-plugin")
 }
 
+springBoot.mainClass.set("webapp.Application")
+
+tasks.register("cli") {
+    group = "application"
+    description = "Run webapp cli: ./gradlew -q cli --args='your args there'"
+    doFirst {
+        springBoot
+            .mainClass
+            .set("webapp.Cli")
+    }
+    finalizedBy("bootRun")
+}
+
 group = properties["artifact.group"].toString()
 version = properties["artifact.version"].toString()
 
@@ -128,11 +141,10 @@ tasks.withType<Test> {
     }
 }
 
-val Project.sep: String  get() = getProperty("file.separator")
-
 tasks.register<Delete>("cleanResources") {
     description = "Delete directory build/resources"
     group = "build"
+    val sep: String  = getProperty("file.separator")
     delete(buildString {
         append("build")
         append(sep)
@@ -143,6 +155,7 @@ tasks.register<Delete>("cleanResources") {
 tasks.register<TestReport>("testReport") {
     description = "Generates an HTML test report from the results of testReport task."
     group = "report"
+    val sep: String  = getProperty("file.separator")
     destinationDirectory.set(file(buildString {
         append(buildDir)
         append(sep)
@@ -153,16 +166,8 @@ tasks.register<TestReport>("testReport") {
     reportOn("test")
 }
 
-//springBoot.mainClass.set("webapp.BackendBootstrap")
-///*
-//./gradlew -q cli --args='your args there'
-// */
-//tasks.register("cli") {
-//    group = "application"
-//    description = "Run webapp cli"
-//    doFirst { springBoot.mainClass.set("webapp.CliBootstrap") }
-//    finalizedBy("bootRun")
-//}
+
+
 
 //TODO: CLI apiclient to setup mailsurp
 //create 2 inboxes: signup,password

@@ -19,7 +19,7 @@ import org.springframework.security.web.server.util.matcher.OrServerWebExchangeM
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers.pathMatchers
 import org.springframework.web.cors.reactive.CorsWebFilter
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource
-import webapp.Application.SpaWebFilter
+import webapp.Configuration.SpaWebFilter
 import webapp.Constants.CONTENT_SECURITY_POLICY
 import webapp.Constants.FEATURE_POLICY
 import webapp.Constants.ROLE_ADMIN

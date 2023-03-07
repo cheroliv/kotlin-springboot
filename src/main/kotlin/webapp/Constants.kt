@@ -54,7 +54,7 @@ object Constants {
     const val SWAGGER = "swagger"
     const val NO_LIQUIBASE = "no-liquibase"
     const val K8S = "k8s"
-    const val CLI = "cli"
+    const val CLI = "utils"
     const val GMAIL = "gmail"
     const val MAILSLURP = "mailslurp"
 
