@@ -20,6 +20,8 @@ import webapp.accounts.exceptions.UsernameAlreadyUsedException
 import webapp.accounts.models.AccountCredentials
 import webapp.accounts.models.AccountCredentials.Companion.objectName
 import webapp.signup.SignupUtils.badResponse
+import webapp.signup.SignupUtils.badResponseEmailIsNotAvailable
+import webapp.signup.SignupUtils.badResponseLoginIsNotAvailable
 import webapp.signup.SignupUtils.emailAvailable
 import webapp.signup.SignupUtils.emailIsNotAvailable
 import webapp.signup.SignupUtils.loginAvailable
@@ -47,64 +49,46 @@ class SignupController(private val signupService: SignupService) {
         SIGNUP_API,
         produces = [APPLICATION_PROBLEM_JSON_VALUE]
     )
-    @ResponseStatus(CREATED)
+//    @ResponseStatus(CREATED)
     suspend fun signup(
         @RequestBody account: AccountCredentials,
         exchange: ServerWebExchange
-    ): ResponseEntity<ProblemDetail> = account.run acc@{
-        //TODO: inverser les type de l'extension function
-        exchange.signupChecks(this).run {
-            when {
-                isNotEmpty() -> return signupProblems.badResponse(this)
-                else -> try {
-                    //TODO: problemsModel.badResponseLoginIsNotAvailable
-                    if (loginIsNotAvailable) return signupProblems.badResponse(
-                        setOf(
-                            mapOf(
-                                "objectName" to objectName,
-                                "field" to LOGIN_FIELD,
-                                "message" to "Login name already used!"
+    ): ResponseEntity<ProblemDetail> {
+        return account.run acc@{
+            signupChecks(exchange).run {
+                when {
+                    isNotEmpty() -> return signupProblems.badResponse(this)
+                    else -> try {
+                        if (loginIsNotAvailable) return signupProblems.badResponseLoginIsNotAvailable
+                        if (emailIsNotAvailable) return signupProblems.badResponseEmailIsNotAvailable
+                        loginAvailable(signupService)
+                        emailAvailable(signupService)
+                    } catch (e: UsernameAlreadyUsedException) {
+                        return signupProblems.badResponse(
+                            setOf(
+                                mapOf(
+                                    "objectName" to objectName,
+                                    "field" to LOGIN_FIELD,
+                                    "message" to e.message!!
+                                )
                             )
                         )
-                    )
-                    //TODO: problemsModel.badResponseEmailIsNotAvailable
-                    if (emailIsNotAvailable) return signupProblems.badResponse(
-                        setOf(
-                            mapOf(
-                                "objectName" to objectName,
-                                "field" to EMAIL_FIELD,
-                                "message" to "Email is already in use!"
+                    } catch (e: EmailAlreadyUsedException) {
+                        return signupProblems.badResponse(
+                            setOf(
+                                mapOf(
+                                    "objectName" to objectName,
+                                    "field" to EMAIL_FIELD,
+                                    "message" to e.message!!
+                                )
                             )
                         )
-                    )
-
-                    loginAvailable(signupService)
-                    emailAvailable(signupService)
-                } catch (e: UsernameAlreadyUsedException) {
-                    return signupProblems.badResponse(
-                        setOf(
-                            mapOf(
-                                "objectName" to objectName,
-                                "field" to LOGIN_FIELD,
-                                "message" to e.message!!
-                            )
-                        )
-                    )
-                } catch (e: EmailAlreadyUsedException) {
-                    return signupProblems.badResponse(
-                        setOf(
-                            mapOf(
-                                "objectName" to objectName,
-                                "field" to EMAIL_FIELD,
-                                "message" to e.message!!
-                            )
-                        )
-                    )
+                    }
                 }
             }
+            signupService.signup(this)
+            ResponseEntity<ProblemDetail>(CREATED)
         }
-        signupService.signup(this)
-        ResponseEntity<ProblemDetail>(CREATED)
     }
 
 

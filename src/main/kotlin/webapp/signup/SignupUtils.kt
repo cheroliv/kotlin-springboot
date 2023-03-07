@@ -43,10 +43,10 @@ object SignupUtils {
             .buildValidatorFactory()
             .validator
 
-    fun ServerWebExchange.signupChecks(
-        accountCredentials: AccountCredentials
+    fun AccountCredentials.signupChecks(
+        exchange:ServerWebExchange
     ): Set<Map<String, String?>> {
-        validator.run {
+        exchange.validator.run {
             return setOf(
                 PASSWORD_FIELD,
                 EMAIL_FIELD,
@@ -54,7 +54,7 @@ object SignupUtils {
                 FIRST_NAME_FIELD,
                 LAST_NAME_FIELD
             ).map { field ->
-                field to validateProperty(accountCredentials, field)
+                field to validateProperty(this@signupChecks, field)
             }.flatMap { violatedField ->
                 violatedField.second.map {
                     mapOf<String, String?>(
@@ -79,6 +79,27 @@ object SignupUtils {
             setProperty("fieldErrors", fieldErrors)
         }
     )
+
+    val ProblemsModel.badResponseLoginIsNotAvailable
+        get() = badResponse(
+            setOf(
+                mapOf(
+                    "objectName" to objectName,
+                    "field" to LOGIN_FIELD,
+                    "message" to "Login name already used!"
+                )
+            )
+        )
+    val ProblemsModel.badResponseEmailIsNotAvailable
+        get() = badResponse(setOf(
+            mapOf(
+                "objectName" to objectName,
+                "field" to EMAIL_FIELD,
+                "message" to "Email is already in use!"
+            )
+        ))
+
+
 
     val AccountCredentials.emailIsNotAvailable: Boolean
         get() = false
