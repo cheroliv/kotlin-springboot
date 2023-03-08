@@ -52,7 +52,7 @@ class SignupController(private val signupService: SignupService) {
             account.loginIsNotAvailable(signupService) -> problems.badResponseLoginIsNotAvailable
             account.emailIsNotAvailable(signupService) -> problems.badResponseEmailIsNotAvailable
             else -> try {
-                signupService.signup(account).run {
+                signupService.signup(account).apply {
                     if (this != null)
                         i("activation link: $BASE_URL_DEV$ACTIVATE_API_PATH$activationKey")
                 }
@@ -83,19 +83,17 @@ class SignupController(private val signupService: SignupService) {
                 return problems.serverErrorResponse(MSG_WRONG_ACTIVATION_KEY)
             }
 
-            else -> {
+            else -> return try {
                 d("activation: ${account.login}")
-                try {
-                    signupService.saveAccount(
-                        account.copy(
-                            activated = true,
-                            activationKey = null
-                        )
+                signupService.saveAccount(
+                    account.copy(
+                        activated = true,
+                        activationKey = null
                     )
-                } catch (e: Exception) {
-                    return problems.serverErrorResponse(e.message!!)
-                }
-                return ResponseEntity(OK)
+                )
+                ResponseEntity(OK)
+            } catch (e: Exception) {
+                problems.serverErrorResponse(e.message!!)
             }
         }
     }

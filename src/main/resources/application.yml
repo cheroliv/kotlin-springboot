@@ -66,10 +66,12 @@ spring:
 
 logging:
   level:
+    webapp: DEBUG
     org:
       springframework:
         r2dbc: INFO
         org.hibernate.SQL: INFO
+        web: DEBUG
 
 ##############################################################################
 

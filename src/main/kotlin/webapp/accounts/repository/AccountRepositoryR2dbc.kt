@@ -82,13 +82,13 @@ class AccountRepositoryR2dbc(
     override suspend fun signup(accountCredentials: AccountCredentials): AccountCredentials? = dao
         .insert(AccountEntity(accountCredentials))
         .awaitSingleOrNull().run {
-            when {
-                this != null && id != null -> toCredentialsModel.apply {
+            return when {
+                this != null && id != null ->  toCredentialsModel.apply {
                     dao.insert(AccountAuthorityEntity(userId = id!!, role = ROLE_USER))
                         .awaitSingleOrNull()
                 }
+                else -> null
             }
-            null
         }
 
 
