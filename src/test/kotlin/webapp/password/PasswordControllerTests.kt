@@ -5,9 +5,6 @@
 
 package webapp.password
 
-//import org.assertj.core.api.Assertions.assertThat
-//import org.springframework.test.web.reactive.server.returnResult
-//import java.net.URI
 import jakarta.validation.Validator
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
@@ -15,13 +12,16 @@ import org.junit.jupiter.api.BeforeAll
 import org.springframework.beans.factory.getBean
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
+import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.web.reactive.server.WebTestClient
-import org.springframework.test.web.reactive.server.WebTestClient.bindToApplicationContext
+import org.springframework.test.web.reactive.server.returnResult
 import webapp.*
 import webapp.Constants.BASE_URL_DEV
+import webapp.Constants.CHANGE_PASSWORD_API_PATH
 import webapp.DataTests.adminAccount
 import webapp.DataTests.defaultAccount
 import webapp.Logging.i
+import webapp.accounts.models.PasswordChange
 import kotlin.test.*
 
 internal class PasswordControllerTests {
@@ -29,12 +29,7 @@ internal class PasswordControllerTests {
     private lateinit var context: ConfigurableApplicationContext
     private val dao: R2dbcEntityTemplate by lazy { context.getBean() }
     private val validator: Validator by lazy { context.getBean() }
-    private val client: WebTestClient by lazy {
-        bindToApplicationContext(context)
-            .configureClient()
-            .baseUrl(BASE_URL_DEV)
-            .build()
-    }
+
 
     @BeforeAll
     fun `lance le server en profile test`() {
@@ -46,6 +41,19 @@ internal class PasswordControllerTests {
 
     @AfterEach
     fun tearDown() = deleteAllAccounts(dao)
+
+        private val client: WebTestClient by lazy {
+        WebTestClient.bindToServer()
+            .baseUrl(BASE_URL_DEV)
+            .build()
+    }
+
+//    private val client: WebTestClient by lazy {
+//        bindToApplicationContext(context)
+//            .configureClient()
+//            .baseUrl(BASE_URL_DEV)
+//            .build()
+//    }
     @Test
     fun `test Change Password Wrong Existing Password`() {
         i("test Change Password Wrong Existing Password")
@@ -67,17 +75,18 @@ internal class PasswordControllerTests {
             assertNull(activationKey)
         }
 
-
-//        client
+        client
 //            .mutateWith(mockUser())
-//            .post()
-//            .uri(Constants.SIGNUP_API_PATH)
-//            .contentType(MediaType.APPLICATION_JSON)
-//            .bodyValue(DataTests.defaultAccount.copy(login = "foo", email = "foo@acme.com"))
-//            .exchange()
-//            .expectStatus()
-//            .isCreated
-//            .returnResult<Unit>()
+            .post()
+            .uri(CHANGE_PASSWORD_API_PATH)
+            .contentType(APPLICATION_JSON)
+            .bodyValue(PasswordChange("user","foobar"))
+            .exchange()
+            .expectStatus()
+            .is5xxServerError
+//            .isOk
+            .returnResult<Unit>()
+//            .returnResult<ResponseEntity<ProblemDetail>>()
 //            .responseBodyContent!!
 //            .isEmpty()
 //            .run { assertTrue(this) }

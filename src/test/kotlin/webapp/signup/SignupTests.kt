@@ -100,7 +100,7 @@ internal class SignupTests {
             .exchange()
             .expectStatus()
             .isCreated
-            .returnResult<Unit>()
+            .returnResult<ResponseEntity<ProblemDetail>>()
             .responseBodyContent!!
             .isEmpty()
             .run { assertTrue(this) }
@@ -140,7 +140,7 @@ internal class SignupTests {
             .exchange()
             .expectStatus()
             .isBadRequest
-            .returnResult<Unit>()
+            .returnResult<ResponseEntity<ProblemDetail>>()
             .responseBodyContent!!
             .logBody()
             .isNotEmpty()
@@ -161,7 +161,7 @@ internal class SignupTests {
             .exchange()
             .expectStatus()
             .isBadRequest
-            .returnResult<Unit>()
+            .returnResult<ResponseEntity<ProblemDetail>>()
             .responseBodyContent!!
             .isNotEmpty()
             .run { assertTrue(this) }
@@ -195,7 +195,7 @@ internal class SignupTests {
             .exchange()
             .expectStatus()
             .isBadRequest
-            .returnResult<Unit>()
+            .returnResult<ResponseEntity<ProblemDetail>>()
             .responseBodyContent!!
             .logBody()
             .isNotEmpty()
@@ -214,7 +214,7 @@ internal class SignupTests {
             .exchange()
             .expectStatus()
             .isBadRequest
-            .returnResult<Unit>()
+            .returnResult<ResponseEntity<ProblemDetail>>()
             .responseBodyContent!!
             .isNotEmpty()
             .run { assertTrue(this) }
@@ -243,7 +243,7 @@ internal class SignupTests {
             .exchange()
             .expectStatus()
             .isBadRequest
-            .returnResult<Unit>()
+            .returnResult<ResponseEntity<ProblemDetail>>()
             .responseBodyContent!!
             .isNotEmpty()
             .run { assertTrue(this) }
@@ -272,7 +272,7 @@ internal class SignupTests {
             .exchange()
             .expectStatus()
             .isBadRequest
-            .returnResult<Unit>()
+            .returnResult<ResponseEntity<ProblemDetail>>()
             .responseBodyContent!!
             .isNotEmpty()
             .run { assertTrue(this) }

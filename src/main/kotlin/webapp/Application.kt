@@ -15,7 +15,7 @@ import java.util.*
 class Application {
     companion object {
         @JvmStatic
-       suspend fun main(args: Array<String>) =
+        fun main(args: Array<String>) =
             runApplication<Application>(*args)
                 .checkProfileLog()
                 .bootstrapLog()

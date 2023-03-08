@@ -122,6 +122,8 @@ object Constants {
     const val RESET_PASSWORD_API_INIT = "/reset-password/init"
     const val RESET_PASSWORD_API_FINISH = "/reset-password/finish"
     const val CHANGE_PASSWORD_API = "/change-password"
+    const val CHANGE_PASSWORD_API_PATH = "$ACCOUNT_API$CHANGE_PASSWORD_API"
+
 
     //properties
     const val PROP_ITEM = "webapp.item"

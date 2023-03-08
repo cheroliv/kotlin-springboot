@@ -2,15 +2,20 @@ package webapp.password
 
 import jakarta.validation.Validator
 import jakarta.validation.constraints.Email
+import org.springframework.http.HttpStatus.OK
+import org.springframework.http.ProblemDetail
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import webapp.Constants
+import webapp.Constants.ACCOUNT_API
 import webapp.Constants.CHANGE_PASSWORD_API
 import webapp.Constants.RESET_PASSWORD_API_FINISH
 import webapp.Constants.RESET_PASSWORD_API_INIT
+import webapp.Constants.validationProblems
 import webapp.Logging.w
+import webapp.ProblemsUtils.badResponse
 import webapp.accounts.entities.AccountRecord.Companion.PASSWORD_FIELD
 import webapp.accounts.exceptions.InvalidPasswordException
 import webapp.accounts.models.AccountCredentials
@@ -21,7 +26,7 @@ import webapp.mail.MailService
 /*=================================================================================*/
 @Suppress("unused")
 @RestController
-@RequestMapping(Constants.ACCOUNT_API)
+@RequestMapping(ACCOUNT_API)
 class PasswordController(
     private val passwordService: PasswordService,
     private val mailService: MailService,
@@ -41,33 +46,6 @@ class PasswordController(
                 else -> mailService.sendPasswordResetMail(this)
             }
         }
-
-    /**
-     * {@code POST  /account/change-password} : changes the current user's password.
-     *
-     * @param passwordChange current and new password.
-     * @throws InvalidPasswordProblem {@code 400 (Bad Request)} if the new password is incorrect.
-     */
-    @PostMapping(CHANGE_PASSWORD_API)//TODO: retourner des problemDetails
-    suspend fun changePassword(@RequestBody passwordChange: PasswordChange): Unit =
-        InvalidPasswordException().run {
-            when {
-                validator
-                    .validateProperty(
-                        AccountCredentials(password = passwordChange.newPassword),
-                        PASSWORD_FIELD
-                    ).isNotEmpty() -> throw this
-
-                passwordChange.currentPassword != null
-                        && passwordChange.newPassword != null -> passwordService.changePassword(
-                    passwordChange.currentPassword,
-                    passwordChange.newPassword
-                )
-            }
-
-        }
-
-
 
     /**
      * {@code POST   /account/reset-password/finish} : Finish to reset the password of the user.
@@ -92,6 +70,34 @@ class PasswordController(
                     keyAndPassword.key
                 ) == null -> throw PasswordException("No user was found for this reset key")
             }
+        }
+
+    /**
+     * authenticated
+     *
+     * {@code POST  /account/change-password} : changes the current user's password.
+     *
+     * @param passwordChange current and new password.
+     * @throws InvalidPasswordProblem {@code 400 (Bad Request)} if the new password is incorrect.
+     */
+    @PostMapping(CHANGE_PASSWORD_API)//TODO: retourner des problemDetails
+    suspend fun changePassword(@RequestBody passwordChange: PasswordChange): ResponseEntity<ProblemDetail> =
+        InvalidPasswordException().run {
+            if (validator
+                    .validateProperty(
+                        AccountCredentials(password = passwordChange.newPassword),
+                        PASSWORD_FIELD
+                    ).isNotEmpty()
+            ) return validationProblems.badResponse(setOf(mapOf("" to "")))
+            if (passwordChange.currentPassword != null
+                && passwordChange.newPassword != null
+            ) {
+                passwordService.changePassword(
+                    passwordChange.currentPassword,
+                    passwordChange.newPassword
+                )
+            }
+            ResponseEntity(OK)
         }
 
 }
