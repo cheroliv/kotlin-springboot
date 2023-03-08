@@ -40,33 +40,6 @@ import kotlin.reflect.full.createInstance
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-fun ByteArray.requestToString(): String = map {
-    it.toInt().toChar().toString()
-}.reduce { acc: String, s: String -> acc + s }
-
-fun ByteArray.logBody(): ByteArray = apply {
-    if (isNotEmpty()) map { it.toInt().toChar().toString() }
-        .reduce { request, s ->
-            request + buildString {
-                append(s)
-                if (s == VIRGULE && request.last().isDigit())
-                    append("\n\t")
-            }
-        }.replace("{\"", "\n{\n\t\"")
-        .replace("\"}", "\"\n}")
-        .replace("\",\"", "\",\n\t\"")
-        .run { i("\nbody:$this") }
-}
-
-fun ByteArray.logBodyRaw(): ByteArray = apply {
-    if (isNotEmpty()) map {
-        it.toInt()
-            .toChar()
-            .toString()
-    }.reduce { request, s -> request + s }
-        .run { i(this) }
-}
-
 
 fun launcher(vararg profiles: String) = runApplication<Application> {
     /**
@@ -81,17 +54,20 @@ fun launcher(vararg profiles: String) = runApplication<Application> {
     /**
      * after launching: verification & post construct
      */
-    (if (!environment.defaultProfiles.isNullOrEmpty()) environment
+    (if (environment.defaultProfiles.isNotEmpty()) environment
         .defaultProfiles
         .reduce { acc, s -> "$acc, $s" }
     else "").run { i("defaultProfiles: $this") }
 
-    (if (!environment.activeProfiles.isNullOrEmpty()) environment
+    (if (environment.activeProfiles.isNotEmpty()) environment
         .activeProfiles
         .reduce { acc, s -> "$acc, $s" }
     else "").run { i("activeProfiles: $this") }
 }
 
+fun ByteArray.requestToString(): String = map {
+    it.toInt().toChar().toString()
+}.reduce { acc: String, s: String -> acc + s }
 
 fun createDataAccounts(accounts: Set<AccountCredentials>, dao: R2dbcEntityTemplate) {
     assertEquals(0, countAccount(dao))
@@ -122,6 +98,30 @@ fun createDataAccounts(accounts: Set<AccountCredentials>, dao: R2dbcEntityTempla
     }
     assertEquals(accounts.size, countAccount(dao))
     assertTrue(accounts.size <= countAccountAuthority(dao))
+}
+
+
+fun ByteArray.logBody(): ByteArray = apply {
+    if (isNotEmpty()) map { it.toInt().toChar().toString() }
+        .reduce { request, s ->
+            request + buildString {
+                append(s)
+                if (s == VIRGULE && request.last().isDigit())
+                    append("\n\t")
+            }
+        }.replace("{\"", "\n{\n\t\"")
+        .replace("\"}", "\"\n}")
+        .replace("\",\"", "\",\n\t\"")
+        .run { i("\nbody:$this") }
+}
+
+fun ByteArray.logBodyRaw(): ByteArray = apply {
+    if (isNotEmpty()) map {
+        it.toInt()
+            .toChar()
+            .toString()
+    }.reduce { request, s -> request + s }
+        .run { i(this) }
 }
 
 

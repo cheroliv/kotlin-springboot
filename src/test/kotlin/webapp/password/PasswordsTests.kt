@@ -23,6 +23,7 @@ import webapp.deleteAllAccounts
 import webapp.launcher
 import kotlin.test.Test
 
+
 internal class PasswordControllerTests {
 
     private lateinit var context: ConfigurableApplicationContext
