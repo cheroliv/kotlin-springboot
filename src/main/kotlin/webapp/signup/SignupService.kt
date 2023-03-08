@@ -20,7 +20,7 @@ class SignupService(
     private val passwordEncoder: PasswordEncoder
 ) {
     @Transactional
-    suspend fun signup(account: AccountCredentials): AccountCredentials? = now().run {
+    suspend fun signup(account: AccountCredentials) = now().run {
         account.copy(
             password = passwordEncoder.encode(account.password),
             activationKey = generateActivationKey,
@@ -35,8 +35,8 @@ class SignupService(
             lastModifiedBy = SYSTEM_USER,
             lastModifiedDate = this
         ).run {
-           return accountRepository.signup(this).apply {
-                if (this != null) mailService.sendActivationEmail(this)
+            accountRepository.signup(this).also {
+                if (it != null) mailService.sendActivationEmail(it)
             }
         }
     }
