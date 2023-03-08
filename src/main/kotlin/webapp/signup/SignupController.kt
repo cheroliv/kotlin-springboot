@@ -46,7 +46,7 @@ class SignupController(private val signupService: SignupService) {
         d("signup attempt: ${account.login} ${account.email}")
         val errors = account.validate(exchange)
         return when {
-            errors.isNotEmpty() -> validationProblems.badResponse(errors)
+            errors.isNotEmpty() -> validationProblems.badResponse(errors)//TODO: add path pour validation generale
             account.loginIsNotAvailable(signupService) -> validationProblems.badResponseLoginIsNotAvailable
             account.emailIsNotAvailable(signupService) -> validationProblems.badResponseEmailIsNotAvailable
             else -> {
