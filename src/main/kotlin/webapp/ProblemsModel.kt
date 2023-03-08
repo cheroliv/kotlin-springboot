@@ -1,5 +1,6 @@
 package webapp
 
+import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.BAD_REQUEST
 
 
@@ -11,6 +12,7 @@ data class ProblemsModel(
     val message: String,
     val fieldErrors: MutableSet<Map<String, String>> = mutableSetOf()
 ) {
+
     @Suppress("MemberVisibilityCanBePrivate")
     companion object {
         const val PROBLEM_OBJECT_NAME = "objectName"
@@ -27,6 +29,12 @@ data class ProblemsModel(
             message = "error.validation",
             path = "",
             status = BAD_REQUEST.value(),
+        )
+        val serverErrorProblems = ProblemsModel(
+            type = "https://cheroliv.github.io/problem/internal-server-error",
+            title = "Internal Server Error",
+            message = "error.server",
+            status = HttpStatus.INTERNAL_SERVER_ERROR.value(),
         )
     }
 }

@@ -4,8 +4,12 @@ import jakarta.validation.Validation.byProvider
 import jakarta.validation.Validator
 import org.hibernate.validator.HibernateValidator
 import org.springframework.http.HttpStatus.BAD_REQUEST
+import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
+import org.springframework.http.ProblemDetail
 import org.springframework.http.ProblemDetail.forStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.http.ResponseEntity.badRequest
+import org.springframework.http.ResponseEntity.internalServerError
 import org.springframework.web.server.ServerWebExchange
 import webapp.Constants
 import webapp.ProblemsModel
@@ -24,7 +28,20 @@ import java.util.Locale.of
 
 
 object SignupUtils {
-    val signupProblems = defaultProblems.copy(path = "${Constants.ACCOUNT_API}${Constants.SIGNUP_API}")
+    val validationProblems = defaultProblems.copy(path = "${Constants.ACCOUNT_API}${Constants.SIGNUP_API}")
+
+    fun ProblemsModel.serverErrorResponse(path: String, error: String): ResponseEntity<ProblemDetail> {
+        return internalServerError().body(
+            forStatus(INTERNAL_SERVER_ERROR).apply {
+                type = URI(this@serverErrorResponse.type)
+                title = title
+                status = INTERNAL_SERVER_ERROR.value()
+                setProperty("path", path)
+                setProperty("message", message)
+                setProperty("error", error)
+            }
+        )
+    }
 
     private val ServerWebExchange.validator: Validator
         get() = byProvider(HibernateValidator::class.java)

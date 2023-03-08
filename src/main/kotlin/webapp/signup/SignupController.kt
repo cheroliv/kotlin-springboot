@@ -4,31 +4,31 @@ import org.springframework.http.HttpStatus.CREATED
 import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE
 import org.springframework.http.ProblemDetail
 import org.springframework.http.ResponseEntity
-import org.springframework.http.ResponseEntity.internalServerError
 import org.springframework.http.ResponseEntity.ok
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ServerWebExchange
 import webapp.Constants.ACCOUNT_API
 import webapp.Constants.ACTIVATE_API
 import webapp.Constants.ACTIVATE_API_KEY
+import webapp.Constants.MSG_WRONG_ACTIVATION_KEY
 import webapp.Constants.SIGNUP_API
-import webapp.Logging.i
+import webapp.Logging.d
+import webapp.ProblemsModel.Companion.serverErrorProblems
 import webapp.accounts.models.AccountCredentials
 import webapp.signup.SignupUtils.badResponse
 import webapp.signup.SignupUtils.badResponseEmailIsNotAvailable
 import webapp.signup.SignupUtils.badResponseLoginIsNotAvailable
 import webapp.signup.SignupUtils.emailIsNotAvailable
 import webapp.signup.SignupUtils.loginIsNotAvailable
-import webapp.signup.SignupUtils.signupProblems
+import webapp.signup.SignupUtils.serverErrorResponse
 import webapp.signup.SignupUtils.validate
+import webapp.signup.SignupUtils.validationProblems
 import java.util.*
 import java.util.Locale.*
 
 @RestController
 @RequestMapping(ACCOUNT_API)
 class SignupController(private val signupService: SignupService) {
-
-    internal class SignupException(message: String) : RuntimeException(message)
 
     /**
      * {@code POST  /signup} : register the user.
@@ -43,22 +43,26 @@ class SignupController(private val signupService: SignupService) {
         @RequestBody account: AccountCredentials,
         exchange: ServerWebExchange
     ): ResponseEntity<ProblemDetail> {
-        i("signup attempt: ${account.login} ${account.email}")
+        d("signup attempt: ${account.login} ${account.email}")
         val errors = account.validate(exchange)
         return when {
-            errors.isNotEmpty() -> signupProblems.badResponse(errors)
-            account.loginIsNotAvailable(signupService) -> signupProblems.badResponseLoginIsNotAvailable
-            account.emailIsNotAvailable(signupService) -> signupProblems.badResponseEmailIsNotAvailable
+            errors.isNotEmpty() -> validationProblems.badResponse(errors)
+            account.loginIsNotAvailable(signupService) -> validationProblems.badResponseLoginIsNotAvailable
+            account.emailIsNotAvailable(signupService) -> validationProblems.badResponseEmailIsNotAvailable
             else -> {
                 try {
                     signupService.signup(account)
-                } catch (_: Exception) {
-                    return internalServerError().build()
+                } catch (e: Exception) {
+                    return serverErrorProblems.serverErrorResponse(
+                        "$ACCOUNT_API$SIGNUP_API",
+                        e.message!!
+                    )
                 }
                 ResponseEntity<ProblemDetail>(CREATED)
             }
         }
     }
+
 
 
     /**
@@ -74,12 +78,15 @@ class SignupController(private val signupService: SignupService) {
     ): ResponseEntity<ProblemDetail> {
         when (val account = signupService.accountByActivationKey(key)) {
             null -> {
-                i("no activation for key: $key")//MSG_WRONG_ACTIVATION_KEY
-                return internalServerError().build()
+                d("no activation for key: $key")
+                return serverErrorProblems.serverErrorResponse(
+                    "$ACCOUNT_API$ACTIVATE_API",
+                    MSG_WRONG_ACTIVATION_KEY
+                )
             }
 
             else -> {
-                i("activation: ${account.login}")
+                d("activation: ${account.login}")
                 try {
                     signupService.saveAccount(
                         account.copy(
@@ -87,8 +94,11 @@ class SignupController(private val signupService: SignupService) {
                             activationKey = null
                         )
                     )
-                } catch (_: Exception) {
-                    return internalServerError().build()
+                } catch (e: Exception) {
+                    return serverErrorProblems.serverErrorResponse(
+                        "$ACCOUNT_API$ACTIVATE_API",
+                        e.message!!
+                    )
                 }
                 return ok().build()
             }
