@@ -1,10 +1,10 @@
 package webapp.signup
 
 import org.springframework.http.HttpStatus.CREATED
+import org.springframework.http.HttpStatus.OK
 import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE
 import org.springframework.http.ProblemDetail
 import org.springframework.http.ResponseEntity
-import org.springframework.http.ResponseEntity.ok
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ServerWebExchange
 import webapp.Constants.ACCOUNT_API
@@ -58,7 +58,7 @@ class SignupController(private val signupService: SignupService) {
                         e.message!!
                     )
                 }
-                ResponseEntity<ProblemDetail>(CREATED)
+                ResponseEntity(CREATED)
             }
         }
     }
@@ -71,7 +71,6 @@ class SignupController(private val signupService: SignupService) {
      * @param key the activation key.
      * @return ResponseEntity<ProblemDetail> `500 (Internal Application Error)` if the user couldn't be activated.
      */
-    //TODO: Problem avec model et message i18n
     @GetMapping(ACTIVATE_API)
     suspend fun activateAccount(
         @RequestParam(ACTIVATE_API_KEY) key: String
@@ -100,7 +99,7 @@ class SignupController(private val signupService: SignupService) {
                         e.message!!
                     )
                 }
-                return ok().build()
+                return ResponseEntity(OK)
             }
         }
     }
