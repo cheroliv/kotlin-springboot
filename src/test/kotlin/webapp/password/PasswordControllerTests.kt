@@ -14,22 +14,25 @@ import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.web.reactive.server.WebTestClient
+import org.springframework.test.web.reactive.server.WebTestClient.bindToServer
 import org.springframework.test.web.reactive.server.returnResult
-import webapp.*
 import webapp.Constants.BASE_URL_DEV
 import webapp.Constants.CHANGE_PASSWORD_API_PATH
-import webapp.DataTests.adminAccount
-import webapp.DataTests.defaultAccount
-import webapp.Logging.i
 import webapp.accounts.models.PasswordChange
-import kotlin.test.*
+import webapp.createActivatedUserAndAdmin
+import webapp.deleteAllAccounts
+import webapp.launcher
+import kotlin.test.Test
 
 internal class PasswordControllerTests {
 
     private lateinit var context: ConfigurableApplicationContext
     private val dao: R2dbcEntityTemplate by lazy { context.getBean() }
-    private val validator: Validator by lazy { context.getBean() }
-
+    private val client: WebTestClient by lazy {
+        bindToServer()
+            .baseUrl(BASE_URL_DEV)
+            .build()
+    }
 
     @BeforeAll
     fun `lance le server en profile test`() {
@@ -42,55 +45,24 @@ internal class PasswordControllerTests {
     @AfterEach
     fun tearDown() = deleteAllAccounts(dao)
 
-        private val client: WebTestClient by lazy {
-        WebTestClient.bindToServer()
-            .baseUrl(BASE_URL_DEV)
-            .build()
-    }
 
-//    private val client: WebTestClient by lazy {
-//        bindToApplicationContext(context)
-//            .configureClient()
-//            .baseUrl(BASE_URL_DEV)
-//            .build()
-//    }
     @Test
     fun `test Change Password Wrong Existing Password`() {
-        i("test Change Password Wrong Existing Password")
-        val countUserBefore = countAccount(dao)
-        val countUserAuthBefore = countAccountAuthority(dao)
-        assertEquals(0, countUserBefore)
-        assertEquals(0, countUserAuthBefore)
-        createActivatedDataAccounts(setOf(defaultAccount, adminAccount),dao)
-        assertEquals(2, countAccount(dao))
-        assertEquals(3, countAccountAuthority(dao))
-        findOneByEmail(defaultAccount.email!!, dao).run {
-            assertNotNull(this)
-            assertTrue(activated)
-            assertNull(activationKey)
-        }
-        findOneByEmail(adminAccount.email!!, dao).run {
-            assertNotNull(this)
-            assertTrue(activated)
-            assertNull(activationKey)
-        }
-
+        createActivatedUserAndAdmin(dao)
         client
 //            .mutateWith(mockUser())
             .post()
             .uri(CHANGE_PASSWORD_API_PATH)
             .contentType(APPLICATION_JSON)
-            .bodyValue(PasswordChange("user","foobar"))
+            .bodyValue(PasswordChange("user", "foobar"))
             .exchange()
             .expectStatus()
             .is5xxServerError
-//            .isOk
             .returnResult<Unit>()
-//            .returnResult<ResponseEntity<ProblemDetail>>()
-//            .responseBodyContent!!
-//            .isEmpty()
-//            .run { assertTrue(this) }
     }
+
+    private val validator: Validator by lazy { context.getBean() }
+
     /*
         @Test
         @WithMockUser("change-password-wrong-existing-password")

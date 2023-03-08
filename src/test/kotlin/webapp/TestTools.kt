@@ -38,6 +38,8 @@ import java.util.*
 import kotlin.reflect.KClass
 import kotlin.reflect.full.createInstance
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 
@@ -63,6 +65,25 @@ fun launcher(vararg profiles: String) = runApplication<Application> {
         .activeProfiles
         .reduce { acc, s -> "$acc, $s" }
     else "").run { i("activeProfiles: $this") }
+}
+fun createActivatedUserAndAdmin(dao:R2dbcEntityTemplate) {
+    val countUserBefore = countAccount(dao)
+    val countUserAuthBefore = countAccountAuthority(dao)
+    assertEquals(0, countUserBefore)
+    assertEquals(0, countUserAuthBefore)
+    createActivatedDataAccounts(setOf(DataTests.defaultAccount, DataTests.adminAccount), dao)
+    assertEquals(2, countAccount(dao))
+    assertEquals(3, countAccountAuthority(dao))
+    findOneByEmail(DataTests.defaultAccount.email!!, dao).run {
+        assertNotNull(this)
+        assertTrue(activated)
+        assertNull(activationKey)
+    }
+    findOneByEmail(DataTests.adminAccount.email!!, dao).run {
+        assertNotNull(this)
+        assertTrue(activated)
+        assertNull(activationKey)
+    }
 }
 
 fun ByteArray.requestToString(): String = map {
