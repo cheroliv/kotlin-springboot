@@ -3,11 +3,8 @@ package webapp.signup
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import webapp.Constants.ACTIVATE_API_PATH
-import webapp.Constants.BASE_URL_DEV
 import webapp.Constants.ROLE_USER
 import webapp.Constants.SYSTEM_USER
-import webapp.Logging.i
 import webapp.accounts.models.Account
 import webapp.accounts.models.AccountCredentials
 import webapp.accounts.models.AccountUtils.generateActivationKey
@@ -24,23 +21,24 @@ class SignupService(
 ) {
     @Transactional
     suspend fun signup(account: AccountCredentials) = now().run {
-        accountRepository.signup(
-            account.copy(
-                password = passwordEncoder.encode(account.password),
-                activationKey = generateActivationKey,
-                authorities = setOf(ROLE_USER),
-                langKey = when {
-                    account.langKey.isNullOrBlank() -> ENGLISH.language
-                    else -> account.langKey
-                },
-                activated = false,
-                createdBy = SYSTEM_USER,
-                createdDate = this,
-                lastModifiedBy = SYSTEM_USER,
-                lastModifiedDate = this
-            ).apply { i("activation link: $BASE_URL_DEV$ACTIVATE_API_PATH$activationKey") }
-        )
-        mailService.sendActivationEmail(account)
+        account.copy(
+            password = passwordEncoder.encode(account.password),
+            activationKey = generateActivationKey,
+            authorities = setOf(ROLE_USER),
+            langKey = when {
+                account.langKey.isNullOrBlank() -> ENGLISH.language
+                else -> account.langKey
+            },
+            activated = false,
+            createdBy = SYSTEM_USER,
+            createdDate = this,
+            lastModifiedBy = SYSTEM_USER,
+            lastModifiedDate = this
+        ).run {
+            accountRepository.signup(this).apply {
+                if (this != null) mailService.sendActivationEmail(this)
+            }
+        }
     }
 
 

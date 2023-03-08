@@ -12,5 +12,5 @@ interface AccountRepository {
     suspend fun findOneByResetKey(key: String): AccountRecord<*>?//<AuthorityRecord>?
     suspend fun findActivationKeyByLogin(login: String): String?
     suspend fun delete(account: Account)
-    suspend fun signup(accountCredentials: AccountCredentials)
+    suspend fun signup(accountCredentials: AccountCredentials):AccountCredentials?
 }

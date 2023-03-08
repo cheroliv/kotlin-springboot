@@ -55,21 +55,21 @@ abstract class AbstractMailService(
         }
     }
 
-    override fun sendActivationEmail(account: AccountCredentials) = sendEmailFromTemplate(
-        account.apply {
-            d("Sending activation email to '${account.email}'")
+    override fun sendActivationEmail(accountCredentials: AccountCredentials) = sendEmailFromTemplate(
+        accountCredentials.apply {
+            d("Sending activation email to '${accountCredentials.email}'")
         }, TEMPLATE_NAME_SIGNUP, TITLE_KEY_SIGNUP
     )
 
-    override fun sendCreationEmail(account: AccountCredentials) = sendEmailFromTemplate(
-        account.apply {
-            d("Sending creation email to '${account.email}'")
+    override fun sendCreationEmail(accountCredentials: AccountCredentials) = sendEmailFromTemplate(
+        accountCredentials.apply {
+            d("Sending creation email to '${accountCredentials.email}'")
         }, TEMPLATE_NAME_CREATION, TITLE_KEY_SIGNUP
     )
 
-    override fun sendPasswordResetMail(account: AccountCredentials) = sendEmailFromTemplate(
-        account.apply {
-            d("Sending password reset email to '${account.email}'")
+    override fun sendPasswordResetMail(accountCredentials: AccountCredentials) = sendEmailFromTemplate(
+        accountCredentials.apply {
+            d("Sending password reset email to '${accountCredentials.email}'")
         }, TEMPLATE_NAME_PASSWORD, TITLE_KEY_PASSWORD
     )
 }

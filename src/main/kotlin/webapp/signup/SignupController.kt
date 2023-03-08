@@ -9,11 +9,14 @@ import org.springframework.web.server.ServerWebExchange
 import webapp.Constants.ACCOUNT_API
 import webapp.Constants.ACTIVATE_API
 import webapp.Constants.ACTIVATE_API_KEY
+import webapp.Constants.ACTIVATE_API_PATH
+import webapp.Constants.BASE_URL_DEV
 import webapp.Constants.MSG_WRONG_ACTIVATION_KEY
 import webapp.Constants.SIGNUP_API
 import webapp.Constants.serverErrorProblems
 import webapp.Constants.validationProblems
 import webapp.Logging.d
+import webapp.Logging.i
 import webapp.ProblemsUtils.badResponse
 import webapp.ProblemsUtils.serverErrorResponse
 import webapp.ProblemsUtils.validate
@@ -48,15 +51,16 @@ class SignupController(private val signupService: SignupService) {
             errors.isNotEmpty() -> problems.badResponse(errors)
             account.loginIsNotAvailable(signupService) -> problems.badResponseLoginIsNotAvailable
             account.emailIsNotAvailable(signupService) -> problems.badResponseEmailIsNotAvailable
-            else -> {
-                try {
-                    signupService.signup(account)
-                } catch (e: Exception) {
-                    return serverErrorProblems
-                        .copy(path = "$ACCOUNT_API$SIGNUP_API")
-                        .serverErrorResponse(e.message!!)
+            else -> try {
+                signupService.signup(account).run {
+                    if (this != null)
+                        i("activation link: $BASE_URL_DEV$ACTIVATE_API_PATH$activationKey")
                 }
                 ResponseEntity(CREATED)
+            } catch (e: Exception) {
+                serverErrorProblems
+                    .copy(path = "$ACCOUNT_API$SIGNUP_API")
+                    .serverErrorResponse(e.message!!)
             }
         }
     }

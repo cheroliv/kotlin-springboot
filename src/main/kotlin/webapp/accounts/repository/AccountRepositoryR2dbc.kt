@@ -9,7 +9,7 @@ import org.springframework.data.r2dbc.core.*
 import org.springframework.data.relational.core.query.Criteria.where
 import org.springframework.data.relational.core.query.Query.query
 import org.springframework.stereotype.Repository
-import webapp.Constants
+import webapp.Constants.ROLE_USER
 import webapp.accounts.entities.AccountAuthorityEntity
 import webapp.accounts.entities.AccountEntity
 import webapp.accounts.entities.AccountRecord.Companion.ACCOUNT_AUTH_USER_ID_FIELD
@@ -79,18 +79,18 @@ class AccountRepositoryR2dbc(
             .awaitOneOrNull()
             ?.activationKey
 
-    override suspend fun signup(accountCredentials: AccountCredentials) = dao
+    override suspend fun signup(accountCredentials: AccountCredentials): AccountCredentials? = dao
         .insert(AccountEntity(accountCredentials))
-        .awaitSingleOrNull()
-        ?.id
-        .run {
-            if (this != null) dao.insert(
-                AccountAuthorityEntity(
-                    userId = this,
-                    role = Constants.ROLE_USER
-                )
-            ).awaitSingleOrNull()
+        .awaitSingleOrNull().run {
+            when {
+                this != null && id != null -> toCredentialsModel.apply {
+                    dao.insert(AccountAuthorityEntity(userId = id!!, role = ROLE_USER))
+                        .awaitSingleOrNull()
+                }
+            }
+            null
         }
+
 
     override suspend fun findOneByActivationKey(key: String) = dao
         .selectOne(
