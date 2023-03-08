@@ -16,13 +16,13 @@ import org.springframework.beans.factory.getBean
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.test.web.reactive.server.WebTestClient
-import org.springframework.test.web.reactive.server.WebTestClient.bindToServer
+import org.springframework.test.web.reactive.server.WebTestClient.bindToApplicationContext
+import webapp.*
 import webapp.Constants.BASE_URL_DEV
+import webapp.DataTests.adminAccount
+import webapp.DataTests.defaultAccount
 import webapp.Logging.i
-import webapp.deleteAllAccounts
-import webapp.launcher
-import kotlin.test.Test
-
+import kotlin.test.*
 
 internal class PasswordControllerTests {
 
@@ -30,7 +30,8 @@ internal class PasswordControllerTests {
     private val dao: R2dbcEntityTemplate by lazy { context.getBean() }
     private val validator: Validator by lazy { context.getBean() }
     private val client: WebTestClient by lazy {
-        bindToServer()
+        bindToApplicationContext(context)
+            .configureClient()
             .baseUrl(BASE_URL_DEV)
             .build()
     }
@@ -48,8 +49,38 @@ internal class PasswordControllerTests {
     @Test
     fun `test Change Password Wrong Existing Password`() {
         i("test Change Password Wrong Existing Password")
-        //TODO: activate account
-        //TODO: get bearer by login
+        val countUserBefore = countAccount(dao)
+        val countUserAuthBefore = countAccountAuthority(dao)
+        assertEquals(0, countUserBefore)
+        assertEquals(0, countUserAuthBefore)
+        createActivatedDataAccounts(setOf(defaultAccount, adminAccount),dao)
+        assertEquals(2, countAccount(dao))
+        assertEquals(3, countAccountAuthority(dao))
+        findOneByEmail(defaultAccount.email!!, dao).run {
+            assertNotNull(this)
+            assertTrue(activated)
+            assertNull(activationKey)
+        }
+        findOneByEmail(adminAccount.email!!, dao).run {
+            assertNotNull(this)
+            assertTrue(activated)
+            assertNull(activationKey)
+        }
+
+
+//        client
+//            .mutateWith(mockUser())
+//            .post()
+//            .uri(Constants.SIGNUP_API_PATH)
+//            .contentType(MediaType.APPLICATION_JSON)
+//            .bodyValue(DataTests.defaultAccount.copy(login = "foo", email = "foo@acme.com"))
+//            .exchange()
+//            .expectStatus()
+//            .isCreated
+//            .returnResult<Unit>()
+//            .responseBodyContent!!
+//            .isEmpty()
+//            .run { assertTrue(this) }
     }
     /*
         @Test
