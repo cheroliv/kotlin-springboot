@@ -12,8 +12,9 @@ import webapp.Constants.ACTIVATE_API
 import webapp.Constants.ACTIVATE_API_KEY
 import webapp.Constants.MSG_WRONG_ACTIVATION_KEY
 import webapp.Constants.SIGNUP_API
+import webapp.Constants.serverErrorProblems
+import webapp.Constants.validationProblems
 import webapp.Logging.d
-import webapp.ProblemsModel.Companion.serverErrorProblems
 import webapp.accounts.models.AccountCredentials
 import webapp.signup.SignupUtils.badResponse
 import webapp.signup.SignupUtils.badResponseEmailIsNotAvailable
@@ -22,7 +23,6 @@ import webapp.signup.SignupUtils.emailIsNotAvailable
 import webapp.signup.SignupUtils.loginIsNotAvailable
 import webapp.signup.SignupUtils.serverErrorResponse
 import webapp.signup.SignupUtils.validate
-import webapp.signup.SignupUtils.validationProblems
 import java.util.*
 import java.util.Locale.*
 
@@ -45,24 +45,24 @@ class SignupController(private val signupService: SignupService) {
     ): ResponseEntity<ProblemDetail> {
         d("signup attempt: ${account.login} ${account.email}")
         val errors = account.validate(exchange)
+        val problems = validationProblems
+            .copy(path = "$ACCOUNT_API$SIGNUP_API")
         return when {
-            errors.isNotEmpty() -> validationProblems.badResponse(errors)//TODO: add path pour validation generale
-            account.loginIsNotAvailable(signupService) -> validationProblems.badResponseLoginIsNotAvailable
-            account.emailIsNotAvailable(signupService) -> validationProblems.badResponseEmailIsNotAvailable
+            errors.isNotEmpty() -> problems.badResponse(errors)
+            account.loginIsNotAvailable(signupService) -> problems.badResponseLoginIsNotAvailable
+            account.emailIsNotAvailable(signupService) -> problems.badResponseEmailIsNotAvailable
             else -> {
                 try {
                     signupService.signup(account)
                 } catch (e: Exception) {
-                    return serverErrorProblems.serverErrorResponse(
-                        "$ACCOUNT_API$SIGNUP_API",
-                        e.message!!
-                    )
+                    return serverErrorProblems
+                        .copy(path = "$ACCOUNT_API$SIGNUP_API")
+                        .serverErrorResponse(e.message!!)
                 }
                 ResponseEntity(CREATED)
             }
         }
     }
-
 
 
     /**
@@ -75,13 +75,11 @@ class SignupController(private val signupService: SignupService) {
     suspend fun activateAccount(
         @RequestParam(ACTIVATE_API_KEY) key: String
     ): ResponseEntity<ProblemDetail> {
+        val problems = serverErrorProblems.copy(path = "$ACCOUNT_API$ACTIVATE_API")
         when (val account = signupService.accountByActivationKey(key)) {
             null -> {
                 d("no activation for key: $key")
-                return serverErrorProblems.serverErrorResponse(
-                    "$ACCOUNT_API$ACTIVATE_API",
-                    MSG_WRONG_ACTIVATION_KEY
-                )
+                return problems.serverErrorResponse(MSG_WRONG_ACTIVATION_KEY)
             }
 
             else -> {
@@ -94,10 +92,7 @@ class SignupController(private val signupService: SignupService) {
                         )
                     )
                 } catch (e: Exception) {
-                    return serverErrorProblems.serverErrorResponse(
-                        "$ACCOUNT_API$ACTIVATE_API",
-                        e.message!!
-                    )
+                    return problems.serverErrorResponse(e.message!!)
                 }
                 return ResponseEntity(OK)
             }

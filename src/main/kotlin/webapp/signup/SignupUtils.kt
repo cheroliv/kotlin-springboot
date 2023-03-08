@@ -11,9 +11,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.http.ResponseEntity.badRequest
 import org.springframework.http.ResponseEntity.internalServerError
 import org.springframework.web.server.ServerWebExchange
-import webapp.Constants
 import webapp.ProblemsModel
-import webapp.ProblemsModel.Companion.defaultProblems
 import webapp.accounts.entities.AccountRecord.Companion.EMAIL_FIELD
 import webapp.accounts.entities.AccountRecord.Companion.FIRST_NAME_FIELD
 import webapp.accounts.entities.AccountRecord.Companion.LAST_NAME_FIELD
@@ -28,11 +26,10 @@ import java.util.Locale.of
 
 
 object SignupUtils {
-    val validationProblems = defaultProblems.copy(path = "${Constants.ACCOUNT_API}${Constants.SIGNUP_API}")
 
 
     //TODO: i18n
-    fun ProblemsModel.serverErrorResponse(path: String, error: String): ResponseEntity<ProblemDetail> {
+    fun ProblemsModel.serverErrorResponse(error: String): ResponseEntity<ProblemDetail> {
         return internalServerError().body(
             forStatus(INTERNAL_SERVER_ERROR).apply {
                 type = URI(this@serverErrorResponse.type)

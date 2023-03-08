@@ -1,7 +1,9 @@
-@file:Suppress("unused")
+@file:Suppress("unused", "MemberVisibilityCanBePrivate")
 
 package webapp
 
+import org.springframework.http.HttpStatus.BAD_REQUEST
+import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import java.net.URI
 import java.net.URI.create
 
@@ -12,7 +14,28 @@ object Constants {
     const val VIRGULE = ","
     const val BASE_URL_DEV = "http://localhost:8080"
 
+    const val PROBLEM_OBJECT_NAME = "objectName"
+    const val PROBLEM_FIELD = "field"
+    const val PROBLEM_MESSAGE = "message"
+    val detailsKeys = setOf(
+        PROBLEM_OBJECT_NAME,
+        PROBLEM_FIELD,
+        PROBLEM_MESSAGE
+    )
+    val validationProblems = ProblemsModel(
+        type = "https://cheroliv.github.io/problem/constraint-violation",
+        title = "Data binding and validation failure",
+        message = "error.validation",
+        path = "",
+        status = BAD_REQUEST.value(),
+    )
 
+    val serverErrorProblems = ProblemsModel(
+        type = "https://cheroliv.github.io/problem/internal-server-error",
+        title = "Internal Server Error",
+        message = "error.server",
+        status = INTERNAL_SERVER_ERROR.value(),
+    )
 
     //SignupController
     @JvmStatic
