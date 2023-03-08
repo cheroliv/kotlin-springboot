@@ -23,6 +23,7 @@ import java.util.Locale.ENGLISH
 import java.util.Locale.of
 
 object ProblemsUtils {
+    val String.objectName get() = replaceFirst(first(), first().lowercaseChar())
     //TODO: i18n
     fun ProblemsModel.serverErrorResponse(error: String): ResponseEntity<ProblemDetail> {
         return internalServerError().body(
@@ -70,7 +71,7 @@ object ProblemsUtils {
                 field to validateProperty(this@validate, field)
             }.flatMap { violatedField ->
                 violatedField.second.map {
-                    mapOf<String, String?>(
+                    mapOf(
                         "objectName" to objectName,
                         "field" to violatedField.first,
                         "message" to it.message

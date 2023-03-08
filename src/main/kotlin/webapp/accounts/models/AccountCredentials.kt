@@ -7,7 +7,7 @@ import webapp.Constants.IMAGE_URL_DEFAULT
 import webapp.Constants.LOGIN_REGEX
 import webapp.Constants.PASSWORD_MAX
 import webapp.Constants.PASSWORD_MIN
-import webapp.Utils.objectName
+import webapp.ProblemsUtils.objectName
 import java.time.Instant
 import java.util.*
 
