@@ -35,28 +35,22 @@ object SignupUtils {
     suspend fun AccountCredentials.loginIsNotAvailable(signupService: SignupService) =
         signupService.accountById(login!!).run {
             if (this == null) return@run false
-            return when {
-                !activated -> {//TODO: try catch return
-                    // internal server error with exception message
-                    signupService.deleteAccount(toAccount())
-                    false
-                }
-
-                else -> true
-            }
+            return idsIsNotAvailable(signupService)
         }
 
     suspend fun AccountCredentials.emailIsNotAvailable(signupService: SignupService) =
         signupService.accountById(email!!).run {
             if (this == null) return@run false
-            return when {
-                !activated -> {//TODO: try catch return
-                    // internal server error with error exception message
-                    signupService.deleteAccount(toAccount())
-                    false
-                }
-
-                else -> true
-            }
+            return idsIsNotAvailable(signupService)
         }
+
+    private suspend fun AccountCredentials.idsIsNotAvailable(signupService: SignupService) = when {
+        !activated -> {//TODO: try catch return
+            // internal server error with error exception message
+            signupService.deleteAccount(toAccount())
+            false
+        }
+
+        else -> true
+    }
 }
