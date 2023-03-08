@@ -2,7 +2,6 @@ package webapp.signup
 
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.http.HttpStatus.OK
-import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE
 import org.springframework.http.ProblemDetail
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -15,16 +14,17 @@ import webapp.Constants.SIGNUP_API
 import webapp.Constants.serverErrorProblems
 import webapp.Constants.validationProblems
 import webapp.Logging.d
+import webapp.ProblemsUtils.badResponse
+import webapp.ProblemsUtils.serverErrorResponse
+import webapp.ProblemsUtils.validate
 import webapp.accounts.models.AccountCredentials
-import webapp.signup.SignupUtils.badResponse
 import webapp.signup.SignupUtils.badResponseEmailIsNotAvailable
 import webapp.signup.SignupUtils.badResponseLoginIsNotAvailable
 import webapp.signup.SignupUtils.emailIsNotAvailable
 import webapp.signup.SignupUtils.loginIsNotAvailable
-import webapp.signup.SignupUtils.serverErrorResponse
-import webapp.signup.SignupUtils.validate
 import java.util.*
 import java.util.Locale.*
+import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE as PROBLEM_JSON
 
 @RestController
 @RequestMapping(ACCOUNT_API)
@@ -35,10 +35,7 @@ class SignupController(private val signupService: SignupService) {
      *
      * @param account the managed user View Model.
      */
-    @PostMapping(
-        SIGNUP_API,
-        produces = [APPLICATION_PROBLEM_JSON_VALUE]
-    )
+    @PostMapping(SIGNUP_API, produces = [PROBLEM_JSON])
     suspend fun signup(
         @RequestBody account: AccountCredentials,
         exchange: ServerWebExchange
@@ -71,7 +68,7 @@ class SignupController(private val signupService: SignupService) {
      * @param key the activation key.
      * @return ResponseEntity `500 (Internal Application Error)` if the user couldn't be activated.
      */
-    @GetMapping(ACTIVATE_API)
+    @GetMapping(ACTIVATE_API, produces = [PROBLEM_JSON])
     suspend fun activateAccount(
         @RequestParam(ACTIVATE_API_KEY) key: String
     ): ResponseEntity<ProblemDetail> {

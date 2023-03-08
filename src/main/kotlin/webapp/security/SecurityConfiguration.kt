@@ -83,16 +83,16 @@ class SecurityConfiguration(
                 "/management/health/**",
                 "/management/info",
                 "/management/prometheus",
-                "/api/**"
             ).permitAll()
             .pathMatchers(
+                "/api/**",
                 "/services/**",
                 "/swagger-resources/**",
-                "/v2/api-docs"
+                "/v2/api-docs",
             ).authenticated()
             .pathMatchers(
                 "/management/**",
-                "/api/admin/**"
+                "/api/admin/**",
             ).hasAuthority(ROLE_ADMIN)
             .and()
             .build()

@@ -28,6 +28,19 @@ class PasswordController(
     private val validator: Validator
 ) {
     internal class PasswordException(message: String) : RuntimeException(message)
+    /**
+     * {@code POST   /account/reset-password/init} : Send an email to reset the password of the user.
+     *
+     * @param mail the mail of the user.
+     */
+    @PostMapping(RESET_PASSWORD_API_INIT)//TODO: retourner des problemDetails
+    suspend fun requestPasswordReset(@RequestBody @Email mail: String) =
+        with(passwordService.requestPasswordReset(mail)) {
+            when {
+                this == null -> w("Password reset requested for non existing mail")
+                else -> mailService.sendPasswordResetMail(this)
+            }
+        }
 
     /**
      * {@code POST  /account/change-password} : changes the current user's password.
@@ -54,19 +67,7 @@ class PasswordController(
 
         }
 
-    /**
-     * {@code POST   /account/reset-password/init} : Send an email to reset the password of the user.
-     *
-     * @param mail the mail of the user.
-     */
-    @PostMapping(RESET_PASSWORD_API_INIT)//TODO: retourner des problemDetails
-    suspend fun requestPasswordReset(@RequestBody @Email mail: String) =
-        with(passwordService.requestPasswordReset(mail)) {
-            when {
-                this == null -> w("Password reset requested for non existing mail")
-                else -> mailService.sendPasswordResetMail(this)
-            }
-        }
+
 
     /**
      * {@code POST   /account/reset-password/finish} : Finish to reset the password of the user.
