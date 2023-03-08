@@ -69,7 +69,7 @@ class SignupController(private val signupService: SignupService) {
      * `GET  /activate` : activate the signed-up user.
      *
      * @param key the activation key.
-     * @return ResponseEntity<ProblemDetail> `500 (Internal Application Error)` if the user couldn't be activated.
+     * @return ResponseEntity `500 (Internal Application Error)` if the user couldn't be activated.
      */
     @GetMapping(ACTIVATE_API)
     suspend fun activateAccount(
