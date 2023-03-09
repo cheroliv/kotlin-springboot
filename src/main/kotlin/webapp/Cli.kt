@@ -7,10 +7,6 @@ import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.runApplication
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
-import webapp.Constants.CLI
-import webapp.Constants.CLI_PROPS
-import webapp.Constants.NORMAL_TERMINATION
-import webapp.Logging.i
 import kotlin.system.exitProcess
 
 @Component

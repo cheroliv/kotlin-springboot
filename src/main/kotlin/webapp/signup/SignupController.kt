@@ -6,25 +6,8 @@ import org.springframework.http.ProblemDetail
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ServerWebExchange
-import webapp.Constants.ACCOUNT_API
-import webapp.Constants.ACTIVATE_API
-import webapp.Constants.ACTIVATE_API_KEY
-import webapp.Constants.ACTIVATE_API_PATH
-import webapp.Constants.BASE_URL_DEV
-import webapp.Constants.MSG_WRONG_ACTIVATION_KEY
-import webapp.Constants.SIGNUP_API
-import webapp.Constants.serverErrorProblems
-import webapp.Constants.validationProblems
-import webapp.Logging.d
-import webapp.Logging.i
-import webapp.ProblemsUtils.badResponse
-import webapp.ProblemsUtils.serverErrorResponse
-import webapp.ProblemsUtils.validate
+import webapp.*
 import webapp.accounts.models.AccountCredentials
-import webapp.signup.SignupUtils.badResponseEmailIsNotAvailable
-import webapp.signup.SignupUtils.badResponseLoginIsNotAvailable
-import webapp.signup.SignupUtils.emailIsNotAvailable
-import webapp.signup.SignupUtils.loginIsNotAvailable
 import java.util.*
 import java.util.Locale.*
 import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE as PROBLEM_JSON

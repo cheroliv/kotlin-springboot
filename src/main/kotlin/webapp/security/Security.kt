@@ -14,13 +14,7 @@ import org.springframework.security.core.Authentication
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.User
 import org.springframework.stereotype.Component
-import webapp.Constants.AUTHORITIES_KEY
-import webapp.Constants.INVALID_TOKEN
-import webapp.Constants.VALID_TOKEN
-import webapp.Logging.d
-import webapp.Logging.i
-import webapp.Logging.t
-import webapp.Logging.w
+import webapp.*
 import webapp.Properties
 import java.security.Key
 import java.util.*

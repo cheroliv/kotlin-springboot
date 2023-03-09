@@ -9,16 +9,13 @@ import org.springframework.mail.javamail.MimeMessageHelper
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
 import org.thymeleaf.spring6.SpringTemplateEngine
-import webapp.Constants
-import webapp.Logging.d
-import webapp.Logging.w
-import webapp.Properties
+import webapp.*
 import kotlin.text.Charsets.UTF_8
 
 /*=================================================================================*/
 @Async
 @Service
-@Profile("!${Constants.MAILSLURP} & !${Constants.GMAIL}")
+@Profile("!$MAILSLURP & !$GMAIL")
 class MailServiceSmtp(
     private val properties: Properties,
     private val mailSender: JavaMailSender,

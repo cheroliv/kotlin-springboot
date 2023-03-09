@@ -4,7 +4,8 @@ import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Pattern
 import jakarta.validation.constraints.Size
-import webapp.Constants
+import webapp.IMAGE_URL_DEFAULT
+import webapp.LOGIN_REGEX
 import java.time.Instant
 import java.util.*
 
@@ -15,7 +16,7 @@ import java.util.*
 data class Account(
     val id: UUID? = null,
     @field:NotBlank
-    @field:Pattern(regexp = Constants.LOGIN_REGEX)
+    @field:Pattern(regexp = LOGIN_REGEX)
     @field:Size(min = 1, max = 50)
     val login: String? = null,
     @field:Size(max = 50)
@@ -26,7 +27,7 @@ data class Account(
     @field:Size(min = 5, max = 254)
     val email: String? = null,
     @field:Size(max = 256)
-    val imageUrl: String? = Constants.IMAGE_URL_DEFAULT,
+    val imageUrl: String? = IMAGE_URL_DEFAULT,
     val activated: Boolean = false,
     @field:Size(min = 2, max = 10)
     val langKey: String? = null,

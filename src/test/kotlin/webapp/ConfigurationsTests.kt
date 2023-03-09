@@ -5,10 +5,7 @@ import org.junit.jupiter.api.BeforeAll
 import org.springframework.beans.factory.getBean
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.context.MessageSource
-import webapp.Constants.DEVELOPMENT
-import webapp.Constants.PRODUCTION
-import webapp.Constants.STARTUP_LOG_MSG_KEY
-import webapp.Logging.i
+import webapp.*
 import java.util.*
 import java.util.Locale.FRENCH
 import java.util.Locale.getDefault

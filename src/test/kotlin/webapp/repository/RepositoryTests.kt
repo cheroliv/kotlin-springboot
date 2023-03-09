@@ -10,9 +10,6 @@ import org.junit.jupiter.api.BeforeAll
 import org.springframework.beans.factory.getBean
 import org.springframework.context.ConfigurableApplicationContext
 import webapp.*
-import webapp.Constants.DEFAULT_LANGUAGE
-import webapp.Constants.ROLE_USER
-import webapp.Constants.SYSTEM_USER
 import webapp.DataTests.accounts
 import webapp.DataTests.defaultAccount
 import webapp.accounts.models.AccountUtils.generateActivationKey

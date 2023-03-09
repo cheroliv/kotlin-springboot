@@ -109,7 +109,7 @@ class Configuration (
     @Bean
     fun jdk8TimeModule(): Jdk8Module = Jdk8Module()
 
-    @Profile("!${Constants.PRODUCTION}")
+    @Profile("!$PRODUCTION")
     fun reactorConfiguration() = Hooks.onOperatorDebug()
 
     // TODO: remove when this is supported in spring-data / spring-boot

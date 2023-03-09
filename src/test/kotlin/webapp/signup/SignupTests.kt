@@ -20,11 +20,6 @@ import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.test.web.reactive.server.WebTestClient.bindToServer
 import org.springframework.test.web.reactive.server.returnResult
 import webapp.*
-import webapp.Constants.ACTIVATE_API_PARAM
-import webapp.Constants.ACTIVATE_API_PATH
-import webapp.Constants.BASE_URL_DEV
-import webapp.Constants.ROLE_ADMIN
-import webapp.Constants.SIGNUP_API_PATH
 import webapp.DataTests.defaultAccount
 import webapp.accounts.entities.AccountRecord.Companion.EMAIL_FIELD
 import webapp.accounts.entities.AccountRecord.Companion.FIRST_NAME_FIELD
@@ -403,7 +398,7 @@ internal class SignupTests {
                     email = "badguy@example.com",
                     activated = true,
                     imageUrl = "http://placehold.it/50x50",
-                    langKey = Constants.DEFAULT_LANGUAGE,
+                    langKey = DEFAULT_LANGUAGE,
                     authorities = setOf(ROLE_ADMIN),
                 )
             )

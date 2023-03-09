@@ -3,8 +3,7 @@ package webapp.signup
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import webapp.Constants.ROLE_USER
-import webapp.Constants.SYSTEM_USER
+import webapp.*
 import webapp.accounts.models.Account
 import webapp.accounts.models.AccountCredentials
 import webapp.accounts.models.AccountUtils.generateActivationKey

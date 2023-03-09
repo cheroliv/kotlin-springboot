@@ -9,7 +9,7 @@ import org.springframework.data.r2dbc.core.*
 import org.springframework.data.relational.core.query.Criteria.where
 import org.springframework.data.relational.core.query.Query.query
 import org.springframework.stereotype.Repository
-import webapp.Constants.ROLE_USER
+import webapp.ROLE_USER
 import webapp.accounts.entities.AccountAuthorityEntity
 import webapp.accounts.entities.AccountEntity
 import webapp.accounts.entities.AccountRecord.Companion.ACCOUNT_AUTH_USER_ID_FIELD

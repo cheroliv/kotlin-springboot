@@ -5,7 +5,7 @@ import jakarta.validation.constraints.Pattern
 import jakarta.validation.constraints.Size
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
-import webapp.Constants.LOGIN_REGEX
+import webapp.LOGIN_REGEX
 import java.util.*
 
 /*=================================================================================*/

@@ -5,17 +5,12 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
 import org.springframework.mail.javamail.JavaMailSender
 import org.springframework.mail.javamail.JavaMailSenderImpl
-import webapp.Constants
-import webapp.Constants.MAIL_DEBUG
-import webapp.Constants.MAIL_SMTP_AUTH
-import webapp.Constants.MAIL_TRANSPORT_PROTOCOL
-import webapp.Constants.MAIL_TRANSPORT_STARTTLS_ENABLE
-import webapp.Properties
+import webapp.*
 
 @Configuration
 class MailConfiguration(private val properties:Properties) {
     @Bean
-    @Profile("!${Constants.MAILSLURP} & !${Constants.GMAIL}")
+    @Profile("!$MAILSLURP & !$GMAIL")
     fun javaMailSender(): JavaMailSender = JavaMailSenderImpl().apply {
         host = properties.mail.host
         port = properties.mail.port

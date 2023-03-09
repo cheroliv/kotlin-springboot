@@ -27,22 +27,16 @@ import org.springframework.context.MessageSource
 import org.springframework.mail.MailSendException
 import org.springframework.mail.javamail.JavaMailSenderImpl
 import org.thymeleaf.spring6.SpringWebFluxTemplateEngine
-import webapp.Constants.DEFAULT
-import webapp.Constants.DEFAULT_LANGUAGE
-import webapp.Constants.DEVELOPMENT
-import webapp.Constants.GMAIL
-import webapp.Constants.MAILSLURP
-import webapp.Constants.TEST
+import webapp.*
 import webapp.accounts.models.AccountCredentials
 import webapp.accounts.models.AccountUtils.generateResetKey
-import webapp.launcher
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileInputStream
 import java.io.InputStreamReader
 import java.net.URI
-import java.nio.charset.Charset
 import java.util.*
+import java.util.Properties
 import java.util.regex.Pattern
 import java.util.regex.Pattern.compile
 import kotlin.test.*
@@ -374,9 +368,12 @@ class MailServiceSmtpTests {
             val prop = Properties()
             prop.load(
                 InputStreamReader(
-                    FileInputStream(File(URI(resource.file).path)), Charset.forName("UTF-8")
+                    FileInputStream(
+                        File(URI(resource.file).path)
+                    ), Charsets.UTF_8
                 )
             )
+
 
             val emailTitle = prop["email.test.title"] as String
             assertThat(message.subject).isEqualTo(emailTitle)

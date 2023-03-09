@@ -15,10 +15,8 @@ import org.springframework.http.ProblemDetail
 import org.springframework.http.ResponseEntity
 import org.springframework.test.web.reactive.server.WebTestClient.bindToServer
 import org.springframework.test.web.reactive.server.returnResult
-import webapp.Constants.BASE_URL_DEV
-import webapp.Constants.CHANGE_PASSWORD_API_PATH
+import webapp.*
 import webapp.DataTests.defaultAccount
-import webapp.Logging.i
 import webapp.accounts.models.PasswordChange
 import webapp.createActivatedUserAndAdmin
 import webapp.deleteAllAccounts

@@ -378,7 +378,7 @@ import java.util.*
 
 //import webapp.Application.Log.log
 //import common.domain.Avatar
-//import webapp.http.util.PaginationUtils.generatePaginationHttpHeaders
+//import webapp.http.util.paginationUtils.generatePaginationHttpHeaders
 ////import webapp.management.UserService
 //import kotlinx.coroutines.flow.Flow
 //import kotlinx.coroutines.flow.toCollection
@@ -631,7 +631,7 @@ class UserService
 //        email: String?,
 //        langKey: String?,
 //        imageUrl: String?
-//    ): Unit = SecurityUtils.getCurrentUserLogin().run {
+//    ): Unit = securityUtils.getCurrentUserLogin().run {
 //        userRepository.findOneByLogin(login = this)?.apply {
 //            this.firstName = firstName
 //            this.lastName = lastName
@@ -646,7 +646,7 @@ class UserService
 //
 //
 //    @Transactional
-//    suspend fun saveUser(user: User): User = SecurityUtils.getCurrentUserLogin()
+//    suspend fun saveUser(user: User): User = securityUtils.getCurrentUserLogin()
 //        .run currentUserLogin@{
 //            user.apply user@{
 //                SYSTEM_USER.apply systemUser@{
@@ -661,7 +661,7 @@ class UserService
 //
 //    @Transactional
 //    suspend fun changePassword(currentClearTextPassword: String, newPassword: String) {
-//        SecurityUtils.getCurrentUserLogin().apply {
+//        securityUtils.getCurrentUserLogin().apply {
 //            if (!isNullOrBlank()) {
 //                userRepository.findOneByLogin(this).apply {
 //                    if (this != null) {
@@ -731,7 +731,7 @@ class UserService
 //
 //    @Transactional(readOnly = true)
 //    suspend fun getUserWithAuthorities(): User? =
-//        SecurityUtils.getCurrentUserLogin().run {
+//        securityUtils.getCurrentUserLogin().run {
 //            return@run if (isNullOrBlank()) null
 //            else userRepository
 //                .findOneWithAuthoritiesByLogin(this)
