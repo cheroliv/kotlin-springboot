@@ -5,6 +5,7 @@ import org.thymeleaf.context.Context
 import org.thymeleaf.spring6.SpringTemplateEngine
 import webapp.*
 import webapp.Properties
+import webapp.logging.d
 import webapp.models.AccountCredentials
 import java.util.Locale.forLanguageTag
 

@@ -13,6 +13,7 @@ import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.springframework.beans.factory.getBean
 import org.springframework.context.ConfigurableApplicationContext
+import webapp.logging.i
 import webapp.models.AccountCredentials
 import kotlin.test.Test
 import java.text.Normalizer.Form.NFD

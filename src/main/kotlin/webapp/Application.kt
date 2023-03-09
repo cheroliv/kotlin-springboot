@@ -5,6 +5,7 @@ package webapp
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.context.annotation.*
+import webapp.logging.startupLog
 import java.util.*
 
 

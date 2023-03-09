@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.test.web.reactive.server.WebTestClient.bindToServer
 import org.springframework.test.web.reactive.server.returnResult
 import webapp.*
+import webapp.logging.i
 import webapp.models.PasswordChange
 import kotlin.test.Test
 

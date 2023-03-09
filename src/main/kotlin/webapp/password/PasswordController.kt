@@ -13,6 +13,7 @@ import webapp.*
 import webapp.entities.AccountRecord.Companion.PASSWORD_FIELD
 import webapp.exceptions.InvalidPasswordException
 import webapp.http.badResponse
+import webapp.logging.w
 import webapp.models.AccountCredentials
 import webapp.models.KeyAndPassword
 import webapp.models.PasswordChange

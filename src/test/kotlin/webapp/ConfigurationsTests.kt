@@ -6,6 +6,7 @@ import org.springframework.beans.factory.getBean
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.context.MessageSource
 import webapp.*
+import webapp.logging.i
 import java.util.*
 import java.util.Locale.FRENCH
 import java.util.Locale.getDefault

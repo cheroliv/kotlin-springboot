@@ -16,6 +16,10 @@ import org.springframework.security.core.userdetails.User
 import org.springframework.stereotype.Component
 import webapp.*
 import webapp.Properties
+import webapp.logging.d
+import webapp.logging.i
+import webapp.logging.t
+import webapp.logging.w
 import java.security.Key
 import java.util.*
 import kotlin.text.Charsets.UTF_8

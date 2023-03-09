@@ -24,6 +24,7 @@ import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService
 import webapp.entities.AccountAuthorityEntity
 import webapp.entities.AccountEntity
+import webapp.logging.i
 import webapp.models.Account
 import webapp.models.AccountCredentials
 import webapp.models.AccountUtils.generateActivationKey

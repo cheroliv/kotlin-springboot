@@ -13,6 +13,7 @@ import reactor.core.publisher.Mono
 import webapp.*
 import webapp.entities.AccountRecord.Companion.EMAIL_FIELD
 import webapp.exceptions.UserNotActivatedException
+import webapp.logging.d
 import webapp.models.AccountCredentials
 import webapp.repository.AccountRepository
 

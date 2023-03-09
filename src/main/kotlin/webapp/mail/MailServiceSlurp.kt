@@ -6,6 +6,7 @@ import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
 import org.thymeleaf.spring6.SpringTemplateEngine
 import webapp.*
+import webapp.logging.i
 
 /*=================================================================================*/
 @Suppress("unused")

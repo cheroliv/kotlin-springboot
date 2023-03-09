@@ -5,7 +5,7 @@ package webapp.http
  */
 
 import org.springframework.http.HttpHeaders
-import webapp.e
+import webapp.logging.e
 import java.io.UnsupportedEncodingException
 import java.net.URLEncoder.encode
 import kotlin.text.Charsets.UTF_8

@@ -22,6 +22,7 @@ import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource
 import webapp.Server.SpaWebFilter
 import webapp.*
 import webapp.Properties
+import webapp.logging.d
 import org.springframework.security.authentication.UserDetailsRepositoryReactiveAuthenticationManager as RepositoryAuthentication
 
 @Configuration

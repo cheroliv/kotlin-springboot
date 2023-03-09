@@ -1,4 +1,4 @@
-package webapp
+package webapp.logging
 
 
 import org.slf4j.Logger
@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory.getLogger
 import org.springframework.beans.factory.getBean
 import org.springframework.context.ApplicationContext
 import org.springframework.context.MessageSource
+import webapp.*
 import java.net.InetAddress
 import java.net.UnknownHostException
 import java.util.Locale.getDefault
