@@ -128,14 +128,16 @@ fun ApplicationContext.createDataAccounts(accounts: Set<AccountCredentials>) {
                 if (acc.login == ADMIN) add(ROLE_ADMIN)
             }
         )).run {
-            getBean<R2dbcEntityTemplate>().insert(this).block()!!.id!!.let { uuid ->
-                authorities!!.map { authority ->
-                    getBean<R2dbcEntityTemplate>().insert(
-                        AccountAuthorityEntity(
-                            userId = uuid,
-                            role = authority.role
-                        )
-                    ).block()
+            getBean<R2dbcEntityTemplate>().let {
+                it.insert(this).block()!!.id!!.let { uuid ->
+                    authorities!!.map { authority ->
+                        it.insert(
+                            AccountAuthorityEntity(
+                                userId = uuid,
+                                role = authority.role
+                            )
+                        ).block()
+                    }
                 }
             }
         }
@@ -186,14 +188,16 @@ fun ApplicationContext.createActivatedDataAccounts(accounts: Set<AccountCredenti
                 }.toSet()
             )
         ).run {
-            getBean<R2dbcEntityTemplate>().insert(this).block()!!.id!!.let { uuid ->
-                authorities!!.map { authority ->
-                    getBean<R2dbcEntityTemplate>().insert(
-                        AccountAuthorityEntity(
-                            userId = uuid,
-                            role = authority.role
-                        )
-                    ).block()
+            getBean<R2dbcEntityTemplate>().let { dao ->
+                dao.insert(this).block()!!.id!!.let { uuid ->
+                    authorities!!.map { authority ->
+                        dao.insert(
+                            AccountAuthorityEntity(
+                                userId = uuid,
+                                role = authority.role
+                            )
+                        ).block()
+                    }
                 }
             }
         }
@@ -203,71 +207,86 @@ fun ApplicationContext.createActivatedDataAccounts(accounts: Set<AccountCredenti
 }
 
 fun ApplicationContext.deleteAllAccounts() {
-    val dao: R2dbcEntityTemplate = getBean()
-    deleteAllAccountAuthority(dao)
-    deleteAccounts(dao)
+    deleteAllAccountAuthority()
+    deleteAccounts()
     assertEquals(0, countAccount())
     assertEquals(0, countAccountAuthority())
 }
 
-fun deleteAccounts(repository: R2dbcEntityTemplate) {
-    repository.delete(AccountEntity::class.java).all().block()
+fun ApplicationContext.deleteAccounts() {
+    getBean<R2dbcEntityTemplate>().delete(AccountEntity::class.java).all().block()
 }
 
-fun deleteAllAccountAuthority(dao: R2dbcEntityTemplate) {
-    dao.delete(AccountAuthorityEntity::class.java).all().block()
+fun ApplicationContext.deleteAllAccountAuthority() {
+    getBean<R2dbcEntityTemplate>().delete(AccountAuthorityEntity::class.java).all().block()
 }
 
 //TODO: revoir les updates avec id!=null
-fun saveAccount(model: AccountCredentials, dao: R2dbcEntityTemplate): Account? =
-    when {
-        model.id != null -> dao.update(
-            AccountEntity(model).copy(
-                version = dao.selectOne(
-                    query(
-                        where("login")
-                            .`is`(model.login!!)
-                            .ignoreCase(true)
-                    ),
-                    AccountEntity::class.java
-                ).block()!!.version
-            )
-        ).block()?.toModel
+fun ApplicationContext.saveAccount(model: AccountCredentials): Account? =
+    getBean<R2dbcEntityTemplate>().run {
+        when {
+            model.id != null -> update(
+                AccountEntity(model).copy(
+                    version = selectOne(
+                        query(
+                            where("login").`is`(model.login!!).ignoreCase(true)
+                        ), AccountEntity::class.java
+                    ).block()!!.version
+                )
+            ).block()?.toModel
 
-        else -> dao.insert(AccountEntity(model)).block()?.toModel
+            else -> insert(AccountEntity(model)).block()?.toModel
+        }
+
     }
 
-fun saveAccountAuthority(
+fun ApplicationContext.saveAccountAuthority(
     id: UUID,
     role: String,
-    dao: R2dbcEntityTemplate
-): AccountAuthorityEntity? =
-    dao.insert(AccountAuthorityEntity(userId = id, role = role)).block()
+): AccountAuthorityEntity? = getBean<R2dbcEntityTemplate>()
+    .insert(AccountAuthorityEntity(userId = id, role = role))
+    .block()
 
 
 fun ApplicationContext.countAccount(): Int =
-    getBean<R2dbcEntityTemplate>().select(AccountEntity::class.java).count().block()?.toInt()!!
+    getBean<R2dbcEntityTemplate>()
+        .select(AccountEntity::class.java)
+        .count().block()?.toInt()!!
 
 
 fun ApplicationContext.countAccountAuthority(): Int =
-    getBean<R2dbcEntityTemplate>().select(AccountAuthorityEntity::class.java).count().block()?.toInt()!!
+    getBean<R2dbcEntityTemplate>()
+        .select(AccountAuthorityEntity::class.java)
+        .count()
+        .block()
+        ?.toInt()!!
 
 
 fun ApplicationContext.findOneByLogin(login: String): AccountCredentials? =
-    getBean<R2dbcEntityTemplate>().select<AccountEntity>()
+    getBean<R2dbcEntityTemplate>()
+        .select<AccountEntity>()
         .matching(query(where("login").`is`(login).ignoreCase(true)))
-        .one().block()?.toCredentialsModel
+        .one()
+        .block()
+        ?.toCredentialsModel
 
 fun ApplicationContext.findOneByEmail(email: String): AccountCredentials? =
-    getBean<R2dbcEntityTemplate>().select<AccountEntity>()
-    .matching(query(where("email").`is`(email).ignoreCase(true)))
-    .one().block()?.toCredentialsModel
+    getBean<R2dbcEntityTemplate>()
+        .select<AccountEntity>()
+        .matching(query(where("email").`is`(email).ignoreCase(true)))
+        .one()
+        .block()
+        ?.toCredentialsModel
 
 fun ApplicationContext.findAllAccountAuthority(): Set<AccountAuthorityEntity> =
-    getBean<R2dbcEntityTemplate>().select(AccountAuthorityEntity::class.java).all().toIterable().toHashSet()
+    getBean<R2dbcEntityTemplate>()
+        .select(AccountAuthorityEntity::class.java)
+        .all()
+        .toIterable()
+        .toHashSet()
 
-private fun createObjectMapper() =
-    ObjectMapper().apply {
+private val createObjectMapper
+    get() = ObjectMapper().apply {
         configure(WRITE_DURATIONS_AS_TIMESTAMPS, false)
         setSerializationInclusion(NON_EMPTY)
         registerModule(JavaTimeModule())
@@ -281,7 +300,7 @@ private fun createObjectMapper() =
  * @throws IOException
  */
 @Throws(IOException::class)
-fun convertObjectToJsonBytes(`object`: Any): ByteArray = createObjectMapper().writeValueAsBytes(`object`)
+fun convertObjectToJsonBytes(`object`: Any): ByteArray = createObjectMapper.writeValueAsBytes(`object`)
 
 /**
  * Create a byte array with a specific size filled with specified data.

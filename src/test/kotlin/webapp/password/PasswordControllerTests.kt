@@ -51,12 +51,10 @@ internal class PasswordControllerTests {
     fun `test Change Password Wrong Existing Password`() {
         val passwordChange = PasswordChange("user", "foobar")
         context.createActivatedUserAndAdmin()
-        val bearer = "Bearer ${context.userToken(defaultAccount)}"
-            .also { i(it) }
         client
             .post()
             .uri(CHANGE_PASSWORD_API_PATH)
-            .header(AUTHORIZATION, bearer)
+            .header(AUTHORIZATION, "Bearer ${context.userToken(defaultAccount)}".also { i(it) })
             .contentType(APPLICATION_JSON)
             .bodyValue(passwordChange)
             .exchange()

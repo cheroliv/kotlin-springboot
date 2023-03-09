@@ -342,7 +342,7 @@ internal class SignupTests {
             assertEquals(defaultAccount.email!!, email!!.lowercase())
             assertFalse(activated)
             //activation du troisieme user
-            saveAccount(copy(activated = true, activationKey = null), context.getBean())
+            context.saveAccount(copy(activated = true, activationKey = null))
         }
         //validation que le troisieme est actif et activationKey est null
         context.findOneByLogin(thirdLogin).run {
