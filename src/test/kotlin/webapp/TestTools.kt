@@ -29,6 +29,8 @@ import webapp.Constants.ROLE_USER
 import webapp.Constants.SYSTEM_USER
 import webapp.Constants.TEST
 import webapp.Constants.VIRGULE
+import webapp.DataTests.adminAccount
+import webapp.DataTests.defaultAccount
 import webapp.Logging.i
 import webapp.accounts.entities.AccountAuthorityEntity
 import webapp.accounts.entities.AccountEntity
@@ -75,33 +77,33 @@ fun launcher(vararg profiles: String) = runApplication<Application> {
     else "").run { i("activeProfiles: $this") }
 }
 
-fun AccountCredentials.userToken(context: ApplicationContext) = mono {
-    context.getBean<Security>().createToken(
+fun ApplicationContext.userToken(accountCredentials: AccountCredentials) = mono {
+    getBean<Security>().createToken(
         RememberMeAuthenticationToken(
-            login,
-            context.getBean<ReactiveUserDetailsService>()
-                .findByUsername(email)
+            accountCredentials.login,
+            getBean<ReactiveUserDetailsService>()
+                .findByUsername(accountCredentials.email)
                 .awaitSingleOrNull(),
             setOf(GrantedAuthority { ROLE_USER }),
         ), true
     )
 }.block()!!
 
-fun createActivatedUserAndAdmin(context: ApplicationContext) {
-    val dao: R2dbcEntityTemplate=context.getBean()
+fun ApplicationContext.createActivatedUserAndAdmin() {
+    val dao: R2dbcEntityTemplate = getBean()
     val countUserBefore = countAccount(dao)
     val countUserAuthBefore = countAccountAuthority(dao)
     assertEquals(0, countUserBefore)
     assertEquals(0, countUserAuthBefore)
-    createActivatedDataAccounts(setOf(DataTests.defaultAccount, DataTests.adminAccount), dao)
+    createActivatedDataAccounts(setOf(defaultAccount, adminAccount), dao)
     assertEquals(2, countAccount(dao))
     assertEquals(3, countAccountAuthority(dao))
-    findOneByEmail(DataTests.defaultAccount.email!!, dao).run {
+    findOneByEmail(defaultAccount.email!!, dao).run {
         assertNotNull(this)
         assertTrue(activated)
         assertNull(activationKey)
     }
-    findOneByEmail(DataTests.adminAccount.email!!, dao).run {
+    findOneByEmail(adminAccount.email!!, dao).run {
         assertNotNull(this)
         assertTrue(activated)
         assertNull(activationKey)
@@ -201,7 +203,8 @@ fun createActivatedDataAccounts(accounts: Set<AccountCredentials>, dao: R2dbcEnt
     assertTrue(accounts.size <= countAccountAuthority(dao))
 }
 
-fun deleteAllAccounts(dao: R2dbcEntityTemplate) {
+fun ApplicationContext.deleteAllAccounts() {
+    val dao: R2dbcEntityTemplate=getBean()
     deleteAllAccountAuthority(dao)
     deleteAccounts(dao)
     assertEquals(0, countAccount(dao))

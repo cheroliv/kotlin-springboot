@@ -53,7 +53,7 @@ internal class SignupTests {
     fun `arrête le serveur`() = context.close()
 
     @AfterEach
-    fun tearDown() = deleteAllAccounts(dao)
+    fun tearDown() = context.deleteAllAccounts()
 
     @Test
     fun `vérifie que la requête contient bien des données cohérentes`() {

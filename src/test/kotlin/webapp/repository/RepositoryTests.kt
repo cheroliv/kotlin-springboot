@@ -45,7 +45,7 @@ internal class AccountRepositoryR2dbcTest {
 
 
     @AfterEach
-    fun tearDown() = deleteAllAccounts(dao)
+    fun tearDown() = context.deleteAllAccounts()
 
 
     @Test

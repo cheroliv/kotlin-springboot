@@ -5,13 +5,10 @@
 
 package webapp.password
 
-import jakarta.validation.Validator
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
-import org.springframework.beans.factory.getBean
 import org.springframework.context.ConfigurableApplicationContext
-import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.http.HttpHeaders.AUTHORIZATION
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.web.reactive.server.WebTestClient.bindToServer
@@ -28,8 +25,6 @@ import kotlin.test.Test
 
 internal class PasswordControllerTests {
     private lateinit var context: ConfigurableApplicationContext
-    private val dao: R2dbcEntityTemplate by lazy { context.getBean() }
-    private val validator: Validator by lazy { context.getBean() }
 
     private val client by lazy {
         bindToServer()
@@ -46,14 +41,14 @@ internal class PasswordControllerTests {
     fun `arrête le serveur`() = context.close()
 
     @AfterEach
-    fun tearDown() = deleteAllAccounts(dao)
+    fun tearDown() = context.deleteAllAccounts()
 
 
     @Test
     fun `test Change Password Wrong Existing Password`() {
-        createActivatedUserAndAdmin(context)
+        context.createActivatedUserAndAdmin()
 
-        val token = "Bearer ${defaultAccount.userToken(context)}".also { i(it) }
+        val token = "Bearer ${context.userToken(defaultAccount)}".also { i(it) }
         val passwordChange = PasswordChange("user", "foobar")
 
         client
