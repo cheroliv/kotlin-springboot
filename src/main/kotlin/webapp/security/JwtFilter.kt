@@ -19,7 +19,7 @@ class JwtFilter(private val security: Security) : WebFilter {
                 return when {
                     !isNullOrBlank() && security.validateToken(this@token) ->
                         filter(exchange)
-                            .contextWrite(withAuthentication(security.getAuthentication(this@token)))
+                            .contextWrite(withAuthentication(security.authentication(this@token)))
 
                     else -> filter(exchange)
                 }

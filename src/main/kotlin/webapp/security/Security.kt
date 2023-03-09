@@ -100,7 +100,7 @@ class Security(
         }
     }
 
-    fun getAuthentication(token: String): Authentication {
+    fun authentication(token: String): Authentication {
         parserBuilder()
             .setSigningKey(key)
             .build()
@@ -112,7 +112,7 @@ class Security(
                     .splitToSequence(",")
                     .mapTo(mutableListOf()) { SimpleGrantedAuthority(it) }
                     .apply authorities@{
-                        return@getAuthentication UsernamePasswordAuthenticationToken(
+                        return@authentication UsernamePasswordAuthenticationToken(
                             User(subject, "", this@authorities),
                             token,
                             this@authorities

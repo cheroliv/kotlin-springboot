@@ -6,31 +6,35 @@
 package webapp.password
 
 import jakarta.validation.Validator
-import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
 import org.springframework.beans.factory.getBean
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
-import org.springframework.security.core.context.ReactiveSecurityContextHolder.getContext
-import org.springframework.security.core.userdetails.ReactiveUserDetailsService
+import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.web.reactive.server.WebTestClient.bindToServer
 import webapp.Constants.BASE_URL_DEV
+import webapp.Constants.CHANGE_PASSWORD_API_PATH
 import webapp.DataTests.defaultAccount
-import webapp.Logging.d
+import webapp.Logging.i
+import webapp.accounts.models.PasswordChange
 import webapp.createActivatedUserAndAdmin
 import webapp.deleteAllAccounts
 import webapp.launcher
-import webapp.security.DomainUserDetailsService
+import webapp.userToken
 import kotlin.test.Test
 
 internal class PasswordControllerTests {
     private lateinit var context: ConfigurableApplicationContext
     private val dao: R2dbcEntityTemplate by lazy { context.getBean() }
     private val validator: Validator by lazy { context.getBean() }
-    private val userDetailsService: ReactiveUserDetailsService by lazy { context.getBean<DomainUserDetailsService>() }
-    private val client by lazy { bindToServer().baseUrl(BASE_URL_DEV).build() }
+
+    private val client by lazy {
+        bindToServer()
+            .baseUrl(BASE_URL_DEV)
+            .build()
+    }
 
     @BeforeAll
     fun `lance le server en profile test`() {
@@ -45,26 +49,19 @@ internal class PasswordControllerTests {
 
 
     @Test
-    fun `test Change Password Wrong Existing Password`() = runBlocking {
+    fun `test Change Password Wrong Existing Password`() {
         createActivatedUserAndAdmin(dao)
-//        client
-//            .post()
-//            .uri(CHANGE_PASSWORD_API_PATH)
-//            .contentType(APPLICATION_JSON)
-//            .bodyValue(PasswordChange("user", "foobar"))
-//            .exchange()
-//            .expectStatus()
-//            .is5xxServerError
-
-        //Create authentication
-        getContext()
-            .block()
-            .run {
-                val details = userDetailsService.findByUsername(defaultAccount.email).block()
-                d(details.toString())
-
-            }
-        //retrieve token
+        val token = defaultAccount.userToken(context)
+        i(token)
+        client
+            .post()
+            .uri(CHANGE_PASSWORD_API_PATH)
+            .header("Authorization", token)
+            .contentType(APPLICATION_JSON)
+            .bodyValue(PasswordChange("user", "foobar"))
+            .exchange()
+            .expectStatus()
+            .is5xxServerError
 
     }
 

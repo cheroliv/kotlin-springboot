@@ -22,11 +22,11 @@ object SecurityUtils {
             }
         }
 
-    suspend fun getCurrentUserLogin() = extractPrincipal(
+    suspend fun currentUserLogin() = extractPrincipal(
         getContext().awaitSingle().authentication
     )!!
 
-    suspend fun getCurrentUserJwt() = getContext()
+    suspend fun currentUserJwt() = getContext()
         .map(SecurityContext::getAuthentication)
         .filter { it.credentials is String }
         .map { it.credentials as String }

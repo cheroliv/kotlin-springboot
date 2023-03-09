@@ -6,15 +6,22 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_EMPTY
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import kotlinx.coroutines.reactor.awaitSingleOrNull
+import kotlinx.coroutines.reactor.mono
 import org.assertj.core.api.Assertions.assertThat
 import org.hamcrest.Description
 import org.hamcrest.TypeSafeDiagnosingMatcher
+import org.springframework.beans.factory.getBean
 import org.springframework.boot.runApplication
 import org.springframework.boot.web.reactive.context.StandardReactiveWebEnvironment
+import org.springframework.context.ApplicationContext
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.data.r2dbc.core.select
 import org.springframework.data.relational.core.query.Criteria.where
 import org.springframework.data.relational.core.query.Query.query
+import org.springframework.security.authentication.RememberMeAuthenticationToken
+import org.springframework.security.core.GrantedAuthority
+import org.springframework.security.core.userdetails.ReactiveUserDetailsService
 import webapp.Constants.ADMIN
 import webapp.Constants.DEFAULT_LANGUAGE
 import webapp.Constants.ROLE_ADMIN
@@ -28,6 +35,7 @@ import webapp.accounts.entities.AccountEntity
 import webapp.accounts.models.Account
 import webapp.accounts.models.AccountCredentials
 import webapp.accounts.models.AccountUtils.generateActivationKey
+import webapp.security.Security
 import java.io.IOException
 import java.lang.Byte.parseByte
 import java.time.Instant.now
@@ -66,7 +74,20 @@ fun launcher(vararg profiles: String) = runApplication<Application> {
         .reduce { acc, s -> "$acc, $s" }
     else "").run { i("activeProfiles: $this") }
 }
-fun createActivatedUserAndAdmin(dao:R2dbcEntityTemplate) {
+
+fun AccountCredentials.userToken(context: ApplicationContext) = mono {
+    context.getBean<Security>().createToken(
+        RememberMeAuthenticationToken(
+            login,
+            context.getBean<ReactiveUserDetailsService>()
+                .findByUsername(email)
+                .awaitSingleOrNull(),
+            setOf(GrantedAuthority { ROLE_USER }),
+        ), true
+    )
+}.block()!!
+
+fun createActivatedUserAndAdmin(dao: R2dbcEntityTemplate) {
     val countUserBefore = countAccount(dao)
     val countUserAuthBefore = countAccountAuthority(dao)
     assertEquals(0, countUserBefore)
