@@ -1,13 +1,13 @@
 package webapp
 
-import org.springframework.http.HttpHeaders
-import java.io.UnsupportedEncodingException
-import java.net.URLEncoder
-import kotlin.text.Charsets.UTF_8
-
 /**
  * Utility file for HTTP headers creation.
  */
+
+import org.springframework.http.HttpHeaders
+import java.io.UnsupportedEncodingException
+import java.net.URLEncoder.encode
+import kotlin.text.Charsets.UTF_8
 
 /**
  *
@@ -18,16 +18,20 @@ import kotlin.text.Charsets.UTF_8
  * @param param a [java.lang.String] object.
  * @return a [org.springframework.http.HttpHeaders] object.
  */
-private fun createAlert(
+private fun HttpHeaders.createAlert(
     applicationName: String,
     message: String?,
     param: String?
-): HttpHeaders = HttpHeaders().apply {
+): HttpHeaders = apply {
     add("X-$applicationName-alert", message)
     try {
-        add("X-$applicationName-params", @Suppress("Since15") (URLEncoder.encode(param, UTF_8)))
+        add(
+            "X-$applicationName-params",
+            encode(param, UTF_8)
+        )
     } catch (_: UnsupportedEncodingException) {
-        // StandardCharsets are supported by every Java implementation so this exceptions will never happen
+        // StandardCharsets are supported by every Java implementation
+        // so this exceptions will never happen
     }
 }
 
@@ -41,15 +45,17 @@ private fun createAlert(
  * @param param a [java.lang.String] object.
  * @return a [org.springframework.http.HttpHeaders] object.
  */
-fun createEntityCreationAlert(
+fun HttpHeaders.createEntityCreationAlert(
     applicationName: String,
     enableTranslation: Boolean,
     entityName: String,
     param: String
 ): HttpHeaders = createAlert(
     applicationName,
-    if (enableTranslation) "$applicationName.$entityName.created"
-    else "A new $entityName is created with identifier $param",
+    when {
+        enableTranslation -> "$applicationName.$entityName.created"
+        else -> "A new $entityName is created with identifier $param"
+    },
     param
 )
 
@@ -63,15 +69,17 @@ fun createEntityCreationAlert(
  * @param param a [java.lang.String] object.
  * @return a [org.springframework.http.HttpHeaders] object.
  */
-fun createEntityUpdateAlert(
+fun HttpHeaders.createEntityUpdateAlert(
     applicationName: String,
     enableTranslation: Boolean,
     entityName: String,
     param: String
 ): HttpHeaders = createAlert(
     applicationName,
-    if (enableTranslation) "$applicationName.$entityName.updated"
-    else "A $entityName is updated with identifier $param",
+    when {
+        enableTranslation -> "$applicationName.$entityName.updated"
+        else -> "A $entityName is updated with identifier $param"
+    },
     param
 )
 
@@ -85,15 +93,17 @@ fun createEntityUpdateAlert(
  * @param param a [java.lang.String] object.
  * @return a [org.springframework.http.HttpHeaders] object.
  */
-fun createEntityDeletionAlert(
+fun HttpHeaders.createEntityDeletionAlert(
     applicationName: String,
     enableTranslation: Boolean,
     entityName: String,
     param: String
 ): HttpHeaders = createAlert(
     applicationName,
-    if (enableTranslation) "$applicationName.$entityName.deleted"
-    else "A $entityName is deleted with identifier $param",
+    when {
+        enableTranslation -> "$applicationName.$entityName.deleted"
+        else -> "A $entityName is deleted with identifier $param"
+    },
     param
 )
 
@@ -108,22 +118,20 @@ fun createEntityDeletionAlert(
  * @param defaultMessage a [java.lang.String] object.
  * @return a [org.springframework.http.HttpHeaders] object.
  */
-fun createFailureAlert(
+fun HttpHeaders.createFailureAlert(
     applicationName: String,
     enableTranslation: Boolean,
     entityName: String?,
     errorKey: String,
     defaultMessage: String?
-): HttpHeaders = e(
-    "Entity processing failed, {}",
-    defaultMessage
-).run {
-    return@run HttpHeaders().apply {
-        add(
-            "X-$applicationName-error",
-            if (enableTranslation) "error.$errorKey"
-            else defaultMessage!!
-        )
-        add("X-$applicationName-params", entityName)
-    }
+): HttpHeaders = apply {
+    e("Entity processing failed, {}", defaultMessage)
+    add(
+        "X-$applicationName-error",
+        when {
+            enableTranslation -> "error.$errorKey"
+            else -> defaultMessage!!
+        }
+    )
+    add("X-$applicationName-params", entityName)
 }
