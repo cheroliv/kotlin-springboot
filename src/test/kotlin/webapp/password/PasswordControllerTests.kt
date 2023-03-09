@@ -16,12 +16,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.test.web.reactive.server.WebTestClient.bindToServer
 import org.springframework.test.web.reactive.server.returnResult
 import webapp.*
-import webapp.DataTests.defaultAccount
 import webapp.accounts.models.PasswordChange
-import webapp.createActivatedUserAndAdmin
-import webapp.deleteAllAccounts
-import webapp.launcher
-import webapp.userToken
 import kotlin.test.Test
 
 internal class PasswordControllerTests {

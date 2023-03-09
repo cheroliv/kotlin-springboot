@@ -22,8 +22,6 @@ import org.springframework.data.relational.core.query.Query.query
 import org.springframework.security.authentication.RememberMeAuthenticationToken
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService
-import webapp.DataTests.adminAccount
-import webapp.DataTests.defaultAccount
 import webapp.accounts.entities.AccountAuthorityEntity
 import webapp.accounts.entities.AccountEntity
 import webapp.accounts.models.Account

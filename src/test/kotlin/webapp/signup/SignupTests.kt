@@ -20,7 +20,6 @@ import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.test.web.reactive.server.WebTestClient.bindToServer
 import org.springframework.test.web.reactive.server.returnResult
 import webapp.*
-import webapp.DataTests.defaultAccount
 import webapp.accounts.entities.AccountRecord.Companion.EMAIL_FIELD
 import webapp.accounts.entities.AccountRecord.Companion.FIRST_NAME_FIELD
 import webapp.accounts.entities.AccountRecord.Companion.LAST_NAME_FIELD
@@ -35,7 +34,8 @@ import kotlin.test.*
 
 internal class SignupTests {
     private lateinit var context: ConfigurableApplicationContext
-//    private val dao: R2dbcEntityTemplate by lazy { context.getBean() }
+
+    //    private val dao: R2dbcEntityTemplate by lazy { context.getBean() }
     private val validator: Validator by lazy { context.getBean() }
     private val client: WebTestClient by lazy { bindToServer().baseUrl(BASE_URL_DEV).build() }
 

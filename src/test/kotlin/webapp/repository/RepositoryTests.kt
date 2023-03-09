@@ -10,8 +10,6 @@ import org.junit.jupiter.api.BeforeAll
 import org.springframework.beans.factory.getBean
 import org.springframework.context.ConfigurableApplicationContext
 import webapp.*
-import webapp.DataTests.accounts
-import webapp.DataTests.defaultAccount
 import webapp.accounts.models.AccountUtils.generateActivationKey
 import webapp.accounts.models.toAccount
 import webapp.accounts.repository.AccountRepository
