@@ -87,7 +87,8 @@ fun AccountCredentials.userToken(context: ApplicationContext) = mono {
     )
 }.block()!!
 
-fun createActivatedUserAndAdmin(dao: R2dbcEntityTemplate) {
+fun createActivatedUserAndAdmin(context: ApplicationContext) {
+    val dao: R2dbcEntityTemplate=context.getBean()
     val countUserBefore = countAccount(dao)
     val countUserAuthBefore = countAccountAuthority(dao)
     assertEquals(0, countUserBefore)

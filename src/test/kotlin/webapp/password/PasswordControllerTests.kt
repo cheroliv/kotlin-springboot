@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeAll
 import org.springframework.beans.factory.getBean
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
+import org.springframework.http.HttpHeaders.AUTHORIZATION
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.web.reactive.server.WebTestClient.bindToServer
 import webapp.Constants.BASE_URL_DEV
@@ -50,15 +51,17 @@ internal class PasswordControllerTests {
 
     @Test
     fun `test Change Password Wrong Existing Password`() {
-        createActivatedUserAndAdmin(dao)
-        val token = defaultAccount.userToken(context)
-        i(token)
+        createActivatedUserAndAdmin(context)
+
+        val token = "Bearer ${defaultAccount.userToken(context)}".also { i(it) }
+        val passwordChange = PasswordChange("user", "foobar")
+
         client
             .post()
             .uri(CHANGE_PASSWORD_API_PATH)
-            .header("Authorization", token)
+            .header(AUTHORIZATION, token)
             .contentType(APPLICATION_JSON)
-            .bodyValue(PasswordChange("user", "foobar"))
+            .bodyValue(passwordChange)
             .exchange()
             .expectStatus()
             .is5xxServerError
