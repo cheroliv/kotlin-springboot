@@ -28,8 +28,8 @@ import org.springframework.mail.MailSendException
 import org.springframework.mail.javamail.JavaMailSenderImpl
 import org.thymeleaf.spring6.SpringWebFluxTemplateEngine
 import webapp.*
-import webapp.accounts.models.AccountCredentials
-import webapp.accounts.models.AccountUtils.generateResetKey
+import webapp.models.AccountCredentials
+import webapp.models.AccountUtils.generateResetKey
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileInputStream

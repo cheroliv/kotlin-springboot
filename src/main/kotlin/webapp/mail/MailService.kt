@@ -1,6 +1,6 @@
 package webapp.mail
 
-import webapp.accounts.models.AccountCredentials
+import webapp.models.AccountCredentials
 
 interface MailService {
     fun sendEmail(

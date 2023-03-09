@@ -22,11 +22,11 @@ import org.springframework.data.relational.core.query.Query.query
 import org.springframework.security.authentication.RememberMeAuthenticationToken
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService
-import webapp.accounts.entities.AccountAuthorityEntity
-import webapp.accounts.entities.AccountEntity
-import webapp.accounts.models.Account
-import webapp.accounts.models.AccountCredentials
-import webapp.accounts.models.AccountUtils.generateActivationKey
+import webapp.entities.AccountAuthorityEntity
+import webapp.entities.AccountEntity
+import webapp.models.Account
+import webapp.models.AccountCredentials
+import webapp.models.AccountUtils.generateActivationKey
 import webapp.security.Security
 import java.io.IOException
 import java.lang.Byte.parseByte

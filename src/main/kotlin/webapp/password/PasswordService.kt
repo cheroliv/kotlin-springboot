@@ -2,9 +2,9 @@ package webapp.password
 
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import webapp.accounts.models.AccountCredentials
-import webapp.accounts.repository.AccountRepository
 import webapp.d
+import webapp.models.AccountCredentials
+import webapp.repository.AccountRepository
 import java.time.Instant
 
 @Service

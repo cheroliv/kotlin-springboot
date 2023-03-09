@@ -10,10 +10,8 @@ import org.junit.jupiter.api.BeforeAll
 import org.springframework.beans.factory.getBean
 import org.springframework.context.ConfigurableApplicationContext
 import webapp.*
-import webapp.accounts.models.AccountUtils.generateActivationKey
-import webapp.accounts.models.toAccount
-import webapp.accounts.repository.AccountRepository
-import webapp.accounts.repository.AccountRepositoryR2dbc
+import webapp.models.AccountUtils.generateActivationKey
+import webapp.models.toAccount
 import java.time.Instant
 import kotlin.test.Test
 import kotlin.test.assertEquals

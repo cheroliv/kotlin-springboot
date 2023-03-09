@@ -3,12 +3,13 @@ package webapp.signup
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import webapp.*
-import webapp.accounts.models.Account
-import webapp.accounts.models.AccountCredentials
-import webapp.accounts.models.AccountUtils.generateActivationKey
-import webapp.accounts.repository.AccountRepository
+import webapp.ROLE_USER
+import webapp.SYSTEM_USER
 import webapp.mail.MailService
+import webapp.models.Account
+import webapp.models.AccountCredentials
+import webapp.models.AccountUtils.generateActivationKey
+import webapp.repository.AccountRepository
 import java.time.Instant.now
 import java.util.Locale.ENGLISH
 

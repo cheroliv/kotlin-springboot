@@ -1,13 +1,12 @@
 package webapp.signup
 
-import webapp.ProblemsModel
-import webapp.accounts.entities.AccountRecord.Companion.EMAIL_FIELD
-import webapp.accounts.entities.AccountRecord.Companion.LOGIN_FIELD
-import webapp.accounts.models.AccountCredentials
-import webapp.accounts.models.AccountCredentials.Companion.objectName
-import webapp.accounts.models.toAccount
-import webapp.badResponse
-
+import webapp.http.badResponse
+import webapp.entities.AccountRecord.Companion.EMAIL_FIELD
+import webapp.entities.AccountRecord.Companion.LOGIN_FIELD
+import webapp.models.AccountCredentials
+import webapp.models.AccountCredentials.Companion.objectName
+import webapp.models.ProblemsModel
+import webapp.models.toAccount
 
 
 val ProblemsModel.badResponseLoginIsNotAvailable

@@ -11,10 +11,10 @@ import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import reactor.core.publisher.Mono
 import webapp.*
-import webapp.accounts.entities.AccountRecord.Companion.EMAIL_FIELD
-import webapp.accounts.exceptions.UserNotActivatedException
-import webapp.accounts.models.AccountCredentials
-import webapp.accounts.repository.AccountRepository
+import webapp.entities.AccountRecord.Companion.EMAIL_FIELD
+import webapp.exceptions.UserNotActivatedException
+import webapp.models.AccountCredentials
+import webapp.repository.AccountRepository
 
 @Suppress("unused")
 @Component("userDetailsService")

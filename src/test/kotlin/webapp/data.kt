@@ -13,9 +13,8 @@ import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.springframework.beans.factory.getBean
 import org.springframework.context.ConfigurableApplicationContext
-import webapp.accounts.models.AccountCredentials
+import webapp.models.AccountCredentials
 import kotlin.test.Test
-import org.apache.commons.lang3.StringUtils.stripAccents
 import java.text.Normalizer.Form.NFD
 import java.text.Normalizer.normalize
 

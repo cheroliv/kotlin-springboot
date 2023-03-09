@@ -7,10 +7,13 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ServerWebExchange
 import webapp.*
-import webapp.accounts.models.AccountCredentials
+import webapp.http.badResponse
+import webapp.http.serverErrorResponse
+import webapp.http.validate
+import webapp.models.AccountCredentials
 import java.util.*
 import java.util.Locale.*
-import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE as PROBLEM_JSON
+import org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE as PROBLEM
 
 @RestController
 @RequestMapping(ACCOUNT_API)
@@ -21,7 +24,7 @@ class SignupController(private val signupService: SignupService) {
      *
      * @param account the managed user View Model.
      */
-    @PostMapping(SIGNUP_API, produces = [PROBLEM_JSON])
+    @PostMapping(SIGNUP_API, produces = [PROBLEM])
     suspend fun signup(
         @RequestBody account: AccountCredentials,
         exchange: ServerWebExchange
@@ -55,7 +58,7 @@ class SignupController(private val signupService: SignupService) {
      * @param key the activation key.
      * @return ResponseEntity `500 (Internal Application Error)` if the user couldn't be activated.
      */
-    @GetMapping(ACTIVATE_API, produces = [PROBLEM_JSON])
+    @GetMapping(ACTIVATE_API, produces = [PROBLEM])
     suspend fun activateAccount(
         @RequestParam(ACTIVATE_API_KEY) key: String
     ): ResponseEntity<ProblemDetail> {

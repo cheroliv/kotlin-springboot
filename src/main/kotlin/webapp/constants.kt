@@ -4,6 +4,7 @@ package webapp
 
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
+import webapp.models.ProblemsModel
 import java.net.URI
 import java.net.URI.create
 
@@ -12,7 +13,6 @@ const val EMPTY_STRING = ""
 const val JUMP_LINE = "\n"
 const val VIRGULE = ","
 const val BASE_URL_DEV = "http://localhost:8080"
-
 const val PROBLEM_OBJECT_NAME = "objectName"
 const val PROBLEM_FIELD = "field"
 const val PROBLEM_MESSAGE = "message"
@@ -47,7 +47,6 @@ val ALLOWED_ORDERED_PROPERTIES = arrayOf(
     "langKey"
 )
 const val NORMAL_TERMINATION = 0
-
 const val DOMAIN_DEV_URL = "acme.com"
 private const val DOMAIN_URL = "https://cheroliv.github.io"
 const val STARTUP_HOST_WARN_LOG_MSG = "The host name could not be determined, using `localhost` as fallback"
@@ -59,7 +58,7 @@ const val EMPTY_CONTEXT_PATH = "/"
 const val HTTPS = "https"
 const val HTTP = "http"
 const val PROFILE_SEPARATOR = ","
-val CLI_PROPS = mapOf("spring.main.web-application-type" to "none")
+val CLI_PROPS by lazy { mapOf("spring.main.web-application-type" to "none") }
 const val SPRING_PROFILE_CONF_DEFAULT_KEY = "spring.profiles.default"
 const val MSG_WRONG_ACTIVATION_KEY = "No user was found for this activation key"
 

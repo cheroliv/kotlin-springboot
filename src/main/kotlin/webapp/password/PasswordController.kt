@@ -10,11 +10,12 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import webapp.*
-import webapp.accounts.entities.AccountRecord.Companion.PASSWORD_FIELD
-import webapp.accounts.exceptions.InvalidPasswordException
-import webapp.accounts.models.AccountCredentials
-import webapp.accounts.models.KeyAndPassword
-import webapp.accounts.models.PasswordChange
+import webapp.entities.AccountRecord.Companion.PASSWORD_FIELD
+import webapp.exceptions.InvalidPasswordException
+import webapp.http.badResponse
+import webapp.models.AccountCredentials
+import webapp.models.KeyAndPassword
+import webapp.models.PasswordChange
 import webapp.mail.MailService
 
 /*=================================================================================*/

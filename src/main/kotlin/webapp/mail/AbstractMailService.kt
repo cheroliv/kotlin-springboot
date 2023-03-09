@@ -5,7 +5,7 @@ import org.thymeleaf.context.Context
 import org.thymeleaf.spring6.SpringTemplateEngine
 import webapp.*
 import webapp.Properties
-import webapp.accounts.models.AccountCredentials
+import webapp.models.AccountCredentials
 import java.util.Locale.forLanguageTag
 
 abstract class AbstractMailService(
