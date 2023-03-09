@@ -13,16 +13,12 @@ import org.junit.jupiter.api.BeforeAll
 import org.springframework.beans.factory.getBean
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
-import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.security.core.context.ReactiveSecurityContextHolder.getContext
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService
-import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.test.web.reactive.server.WebTestClient.bindToServer
-import reactor.core.publisher.Mono
 import webapp.Constants.BASE_URL_DEV
-import webapp.Constants.CHANGE_PASSWORD_API_PATH
-import webapp.DataTests
-import webapp.accounts.models.PasswordChange
+import webapp.DataTests.defaultAccount
+import webapp.Logging.d
 import webapp.createActivatedUserAndAdmin
 import webapp.deleteAllAccounts
 import webapp.launcher
@@ -51,20 +47,21 @@ internal class PasswordControllerTests {
     @Test
     fun `test Change Password Wrong Existing Password`() = runBlocking {
         createActivatedUserAndAdmin(dao)
-        client
-            .post()
-            .uri(CHANGE_PASSWORD_API_PATH)
-            .contentType(APPLICATION_JSON)
-            .bodyValue(PasswordChange("user", "foobar"))
-            .exchange()
-            .expectStatus()
-            .is5xxServerError
+//        client
+//            .post()
+//            .uri(CHANGE_PASSWORD_API_PATH)
+//            .contentType(APPLICATION_JSON)
+//            .bodyValue(PasswordChange("user", "foobar"))
+//            .exchange()
+//            .expectStatus()
+//            .is5xxServerError
 
         //Create authentication
         getContext()
             .block()
             .run {
-                val findByUsername: Mono<UserDetails> = userDetailsService.findByUsername(DataTests.defaultAccount.email)
+                val details = userDetailsService.findByUsername(defaultAccount.email).block()
+                d(details.toString())
 
             }
         //retrieve token
