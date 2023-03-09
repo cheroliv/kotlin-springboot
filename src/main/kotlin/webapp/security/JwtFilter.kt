@@ -7,7 +7,8 @@ import org.springframework.web.server.ServerWebExchange
 import org.springframework.web.server.WebFilter
 import org.springframework.web.server.WebFilterChain
 import reactor.core.publisher.Mono
-import webapp.Constants
+import webapp.Constants.AUTHORIZATION_HEADER
+import webapp.Constants.BEARER_START_WITH
 
 @Component("jwtFilter")
 class JwtFilter(private val security: Security) : WebFilter {
@@ -15,23 +16,26 @@ class JwtFilter(private val security: Security) : WebFilter {
     override fun filter(exchange: ServerWebExchange, chain: WebFilterChain): Mono<Void> {
         resolveToken(exchange.request).apply token@{
             chain.apply {
-                return if (!isNullOrBlank() &&
-                    security.validateToken(this@token)
-                ) filter(exchange)
-                    .contextWrite(withAuthentication(security.getAuthentication(this@token)))
-                else filter(exchange)
+                return when {
+                    !isNullOrBlank() && security.validateToken(this@token) ->
+                        filter(exchange)
+                            .contextWrite(withAuthentication(security.getAuthentication(this@token)))
+
+                    else -> filter(exchange)
+                }
             }
         }
     }
 
     private fun resolveToken(request: ServerHttpRequest): String? = request
         .headers
-        .getFirst(Constants.AUTHORIZATION_HEADER)
+        .getFirst(AUTHORIZATION_HEADER)
         .apply {
-            return if (
-                !isNullOrBlank() &&
-                startsWith(Constants.BEARER_START_WITH)
-            ) substring(startIndex = 7)
-            else null
+            return when {
+                !isNullOrBlank() && startsWith(BEARER_START_WITH) ->
+                    substring(startIndex = 7)
+
+                else -> null
+            }
         }
 }

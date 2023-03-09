@@ -122,6 +122,4 @@ class SecurityConfiguration(
         RepositoryAuthentication(userDetailsService).apply {
             setPasswordEncoder(passwordEncoder())
         }
-
-
 }

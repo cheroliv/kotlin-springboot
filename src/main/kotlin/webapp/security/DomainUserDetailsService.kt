@@ -11,9 +11,9 @@ import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import reactor.core.publisher.Mono
 import webapp.Logging.d
-import webapp.accounts.models.AccountCredentials
 import webapp.accounts.entities.AccountRecord.Companion.EMAIL_FIELD
 import webapp.accounts.exceptions.UserNotActivatedException
+import webapp.accounts.models.AccountCredentials
 import webapp.accounts.repository.AccountRepository
 
 @Suppress("unused")
@@ -42,11 +42,12 @@ class DomainUserDetailsService(
     private fun createSpringSecurityUser(
         lowercaseLogin: String,
         account: AccountCredentials
-    ) = if (!account.activated)
-        throw UserNotActivatedException("User $lowercaseLogin was not activated")
-    else User(
-        account.login!!,
-        account.password!!,
-        account.authorities!!.map { SimpleGrantedAuthority(it) }
-    )
+    ) = when {
+        !account.activated -> throw UserNotActivatedException("User $lowercaseLogin was not activated")
+        else -> User(
+            account.login!!,
+            account.password!!,
+            account.authorities!!.map { SimpleGrantedAuthority(it) }
+        )
+    }
 }

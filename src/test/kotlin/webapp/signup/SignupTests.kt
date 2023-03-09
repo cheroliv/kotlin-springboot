@@ -39,15 +39,10 @@ import kotlin.test.*
 
 
 internal class SignupTests {
-
     private lateinit var context: ConfigurableApplicationContext
     private val dao: R2dbcEntityTemplate by lazy { context.getBean() }
     private val validator: Validator by lazy { context.getBean() }
-    private val client: WebTestClient by lazy {
-        bindToServer()
-            .baseUrl(BASE_URL_DEV)
-            .build()
-    }
+    private val client: WebTestClient by lazy { bindToServer().baseUrl(BASE_URL_DEV).build() }
 
     @BeforeAll
     fun `lance le server en profile test`() {
@@ -464,6 +459,7 @@ internal class SignupTests {
                 }
             }
     }
+
     @Test
     fun `vérifie l'internationalisation des validations par REST avec mot de passe non conforme en francais`() {
         assertEquals(0, countAccount(dao))

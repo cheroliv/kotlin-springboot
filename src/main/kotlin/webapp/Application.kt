@@ -15,11 +15,10 @@ import java.util.*
 class Application {
     companion object {
         @JvmStatic
-        fun main(args: Array<String>) =
-            runApplication<Application>(*args)
-                .checkProfileLog()
-                .bootstrapLog()
-                .`continue`()
+        fun main(args: Array<String>) = runApplication<Application>(*args)
+            .checkProfileLog()
+            .bootstrapLog()
+            .`continue`()
     }
 }
 
