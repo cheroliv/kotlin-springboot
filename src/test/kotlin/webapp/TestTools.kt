@@ -90,13 +90,13 @@ fun ApplicationContext.userToken(accountCredentials: AccountCredentials) = mono 
 }.block()!!
 
 fun ApplicationContext.createActivatedUserAndAdmin() {
-    val countUserBefore = countAccount()
-    val countUserAuthBefore = countAccountAuthority()
+    val countUserBefore = countAccount
+    val countUserAuthBefore = countAccountAuthority
     assertEquals(0, countUserBefore)
     assertEquals(0, countUserAuthBefore)
     createActivatedDataAccounts(setOf(defaultAccount, adminAccount))
-    assertEquals(2, countAccount())
-    assertEquals(3, countAccountAuthority())
+    assertEquals(2, countAccount)
+    assertEquals(3, countAccountAuthority)
     findOneByEmail(defaultAccount.email!!).run {
         assertNotNull(this)
         assertTrue(activated)
@@ -114,8 +114,8 @@ fun ByteArray.requestToString(): String = map {
 }.reduce { acc: String, s: String -> acc + s }
 
 fun ApplicationContext.createDataAccounts(accounts: Set<AccountCredentials>) {
-    assertEquals(0, countAccount())
-    assertEquals(0, countAccountAuthority())
+    assertEquals(0, countAccount)
+    assertEquals(0, countAccountAuthority)
     accounts.map { acc ->
         AccountEntity(acc.copy(
             activationKey = generateActivationKey,
@@ -142,38 +142,40 @@ fun ApplicationContext.createDataAccounts(accounts: Set<AccountCredentials>) {
             }
         }
     }
-    assertEquals(accounts.size, countAccount())
-    assertTrue(accounts.size <= countAccountAuthority())
+    assertEquals(accounts.size, countAccount)
+    assertTrue(accounts.size <= countAccountAuthority)
 }
 
 
-fun ByteArray.logBody(): ByteArray = apply {
-    if (isNotEmpty()) map { it.toInt().toChar().toString() }
-        .reduce { request, s ->
-            request + buildString {
-                append(s)
-                if (s == VIRGULE && request.last().isDigit())
-                    append("\n\t")
-            }
-        }.replace("{\"", "\n{\n\t\"")
-        .replace("\"}", "\"\n}")
-        .replace("\",\"", "\",\n\t\"")
-        .run { i("\nbody:$this") }
-}
+val ByteArray.logBody: ByteArray
+    get() = apply {
+        if (isNotEmpty()) map { it.toInt().toChar().toString() }
+            .reduce { request, s ->
+                request + buildString {
+                    append(s)
+                    if (s == VIRGULE && request.last().isDigit())
+                        append("\n\t")
+                }
+            }.replace("{\"", "\n{\n\t\"")
+            .replace("\"}", "\"\n}")
+            .replace("\",\"", "\",\n\t\"")
+            .run { i("\nbody:$this") }
+    }
 
-fun ByteArray.logBodyRaw(): ByteArray = apply {
-    if (isNotEmpty()) map {
-        it.toInt()
-            .toChar()
-            .toString()
-    }.reduce { request, s -> request + s }
-        .run { i(this) }
-}
+val ByteArray.logBodyRaw: ByteArray
+    get() = apply {
+        if (isNotEmpty()) map {
+            it.toInt()
+                .toChar()
+                .toString()
+        }.reduce { request, s -> request + s }
+            .run { i(this) }
+    }
 
 
 fun ApplicationContext.createActivatedDataAccounts(accounts: Set<AccountCredentials>) {
-    assertEquals(0, countAccount())
-    assertEquals(0, countAccountAuthority())
+    assertEquals(0, countAccount)
+    assertEquals(0, countAccountAuthority)
     accounts.map { acc ->
         AccountEntity(
             acc.copy(
@@ -202,15 +204,15 @@ fun ApplicationContext.createActivatedDataAccounts(accounts: Set<AccountCredenti
             }
         }
     }
-    assertEquals(accounts.size, countAccount())
-    assertTrue(accounts.size <= countAccountAuthority())
+    assertEquals(accounts.size, countAccount)
+    assertTrue(accounts.size <= countAccountAuthority)
 }
 
 fun ApplicationContext.deleteAllAccounts() {
     deleteAllAccountAuthority()
     deleteAccounts()
-    assertEquals(0, countAccount())
-    assertEquals(0, countAccountAuthority())
+    assertEquals(0, countAccount)
+    assertEquals(0, countAccountAuthority)
 }
 
 fun ApplicationContext.deleteAccounts() {
@@ -248,14 +250,14 @@ fun ApplicationContext.saveAccountAuthority(
     .block()
 
 
-fun ApplicationContext.countAccount(): Int =
-    getBean<R2dbcEntityTemplate>()
+val ApplicationContext.countAccount: Int
+    get() = getBean<R2dbcEntityTemplate>()
         .select(AccountEntity::class.java)
         .count().block()?.toInt()!!
 
 
-fun ApplicationContext.countAccountAuthority(): Int =
-    getBean<R2dbcEntityTemplate>()
+val ApplicationContext.countAccountAuthority: Int
+    get() = getBean<R2dbcEntityTemplate>()
         .select(AccountAuthorityEntity::class.java)
         .count()
         .block()
@@ -278,8 +280,8 @@ fun ApplicationContext.findOneByEmail(email: String): AccountCredentials? =
         .block()
         ?.toCredentialsModel
 
-fun ApplicationContext.findAllAccountAuthority(): Set<AccountAuthorityEntity> =
-    getBean<R2dbcEntityTemplate>()
+val ApplicationContext.findAllAccountAuthority: Set<AccountAuthorityEntity>
+    get() = getBean<R2dbcEntityTemplate>()
         .select(AccountAuthorityEntity::class.java)
         .all()
         .toIterable()

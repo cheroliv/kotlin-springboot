@@ -65,7 +65,7 @@ internal class SignupTests {
             .exchange()
             .returnResult<Unit>()
             .requestBodyContent!!
-            .logBody()
+            .logBody
             .requestToString()
             .run {
                 defaultAccount.run {
@@ -83,8 +83,8 @@ internal class SignupTests {
 
     @Test //TODO: mock sendmail
     fun `test signup avec un account valide`() {
-        val countUserBefore = context.countAccount()
-        val countUserAuthBefore = context.countAccountAuthority()
+        val countUserBefore = context.countAccount
+        val countUserAuthBefore = context.countAccountAuthority
         assertEquals(0, countUserBefore)
         assertEquals(0, countUserAuthBefore)
         client
@@ -99,8 +99,8 @@ internal class SignupTests {
             .responseBodyContent!!
             .isEmpty()
             .run { assertTrue(this) }
-        assertEquals(countUserBefore + 1, context.countAccount())
-        assertEquals(countUserAuthBefore + 1, context.countAccountAuthority())
+        assertEquals(countUserBefore + 1, context.countAccount)
+        assertEquals(countUserAuthBefore + 1, context.countAccountAuthority)
         context.findOneByEmail(defaultAccount.email!!).run {
             assertNotNull(this)
             assertFalse(activated)
@@ -125,7 +125,7 @@ internal class SignupTests {
 
     @Test
     fun `test signup account avec login invalid`() {
-        assertEquals(0, context.countAccount())
+        assertEquals(0, context.countAccount)
         client
             .post()
             .uri(SIGNUP_API_PATH)
@@ -137,16 +137,16 @@ internal class SignupTests {
             .isBadRequest
             .returnResult<ResponseEntity<ProblemDetail>>()
             .responseBodyContent!!
-            .logBody()
+            .logBody
             .isNotEmpty()
             .run { assertTrue(this) }
-        assertEquals(0, context.countAccount())
+        assertEquals(0, context.countAccount)
     }
 
 
     @Test
     fun `test signup account avec un email invalid`() {
-        val countBefore = context.countAccount()
+        val countBefore = context.countAccount
         assertEquals(0, countBefore)
         client
             .post()
@@ -181,7 +181,7 @@ internal class SignupTests {
 
     @Test
     fun `test signup account avec un password invalid`() {
-        assertEquals(0, context.countAccount())
+        assertEquals(0, context.countAccount)
         client
             .post()
             .uri(SIGNUP_API_PATH)
@@ -192,15 +192,15 @@ internal class SignupTests {
             .isBadRequest
             .returnResult<ResponseEntity<ProblemDetail>>()
             .responseBodyContent!!
-            .logBody()
+            .logBody
             .isNotEmpty()
             .run { assertTrue(this) }
-        assertEquals(0, context.countAccount())
+        assertEquals(0, context.countAccount)
     }
 
     @Test
     fun `test signup account avec un password null`() {
-        assertEquals(0, context.countAccount())
+        assertEquals(0, context.countAccount)
         client
             .post()
             .uri(SIGNUP_API_PATH)
@@ -213,17 +213,17 @@ internal class SignupTests {
             .responseBodyContent!!
             .isNotEmpty()
             .run { assertTrue(this) }
-        assertEquals(0, context.countAccount())
+        assertEquals(0, context.countAccount)
     }
 
     @Test
     fun `test signup account activé avec un email existant`() {
-        assertEquals(0, context.countAccount())
-        assertEquals(0, context.countAccountAuthority())
+        assertEquals(0, context.countAccount)
+        assertEquals(0, context.countAccountAuthority)
         //activation de l'account
         context.createActivatedDataAccounts(setOf(defaultAccount))
-        assertEquals(1, context.countAccount())
-        assertEquals(1, context.countAccountAuthority())
+        assertEquals(1, context.countAccount)
+        assertEquals(1, context.countAccountAuthority)
         context.findOneByEmail(defaultAccount.email!!).run {
             assertNotNull(this)
             assertTrue(activated)
@@ -247,8 +247,8 @@ internal class SignupTests {
 
     @Test
     fun `test signup account activé avec un login existant`() {
-        assertEquals(0, context.countAccount())
-        assertEquals(0, context.countAccountAuthority())
+        assertEquals(0, context.countAccount)
+        assertEquals(0, context.countAccountAuthority)
         //activation de l'account
         context.createActivatedDataAccounts(setOf(defaultAccount))
         context.findOneByEmail(defaultAccount.email!!).run {
@@ -256,8 +256,8 @@ internal class SignupTests {
             assertTrue(activated)
             assertNull(activationKey)
         }
-        assertEquals(1, context.countAccount())
-        assertEquals(1, context.countAccountAuthority())
+        assertEquals(1, context.countAccount)
+        assertEquals(1, context.countAccountAuthority)
 
         client
             .post()
@@ -276,8 +276,8 @@ internal class SignupTests {
     @Test//TODO: mock sendmail
     fun `test signup account avec un email dupliqué`() {
 
-        assertEquals(0, context.countAccount())
-        assertEquals(0, context.countAccountAuthority())
+        assertEquals(0, context.countAccount)
+        assertEquals(0, context.countAccountAuthority)
         // premier user
         // sign up premier user
         client
@@ -292,8 +292,8 @@ internal class SignupTests {
             .responseBodyContent!!
             .isEmpty()
             .run { assertTrue(this) }
-        assertEquals(1, context.countAccount())
-        assertEquals(1, context.countAccountAuthority())
+        assertEquals(1, context.countAccount)
+        assertEquals(1, context.countAccountAuthority)
         assertFalse(context.findOneByEmail(defaultAccount.email!!)!!.activated)
 
         // email dupliqué, login different
@@ -311,8 +311,8 @@ internal class SignupTests {
             .responseBodyContent!!
             .isEmpty()
             .run { assertTrue(this) }
-        assertEquals(1, context.countAccount())
-        assertEquals(1, context.countAccountAuthority())
+        assertEquals(1, context.countAccount)
+        assertEquals(1, context.countAccountAuthority)
         assertNull(context.findOneByLogin(defaultAccount.login!!))
         context.findOneByLogin(secondLogin).run {
             assertNotNull(this)
@@ -335,8 +335,8 @@ internal class SignupTests {
             .responseBodyContent!!
             .isEmpty()
             .run { assertTrue(this) }
-        assertEquals(1, context.countAccount())
-        assertEquals(1, context.countAccountAuthority())
+        assertEquals(1, context.countAccount)
+        assertEquals(1, context.countAccountAuthority)
         context.findOneByLogin(thirdLogin).run {
             assertNotNull(this)
             assertEquals(defaultAccount.email!!, email!!.lowercase())
@@ -365,8 +365,8 @@ internal class SignupTests {
             .responseBodyContent!!
             .isNotEmpty()
             .run { assertTrue(this) }
-        assertEquals(1, context.countAccount())
-        assertEquals(1, context.countAccountAuthority())
+        assertEquals(1, context.countAccount)
+        assertEquals(1, context.countAccountAuthority)
         assertNull(context.findOneByLogin(fourthLogin))
         //meme id
         assertEquals(context.findOneByLogin(thirdLogin).apply {
@@ -385,8 +385,8 @@ internal class SignupTests {
 
     @Test//TODO: mock sendmail
     fun `test signup account en renseignant l'autorité admin qui sera ignoré et le champ activé qui sera mis à false`() {
-        val countUserBefore = context.countAccount()
-        val countUserAuthBefore = context.countAccountAuthority()
+        val countUserBefore = context.countAccount
+        val countUserAuthBefore = context.countAccountAuthority
         assertEquals(0, countUserBefore)
         assertEquals(0, countUserAuthBefore)
         val login = "badguy"
@@ -415,14 +415,14 @@ internal class SignupTests {
                 assertNotNull(this)
                 assertTrue(isEmpty())
             }
-        assertEquals(countUserBefore + 1, context.countAccount())
-        assertEquals(countUserAuthBefore + 1, context.countAccountAuthority())
+        assertEquals(countUserBefore + 1, context.countAccount)
+        assertEquals(countUserAuthBefore + 1, context.countAccountAuthority)
         context.findOneByLogin(login).run {
             assertNotNull(this)
             assertFalse(activated)
             assertFalse(activationKey.isNullOrBlank())
         }
-        assertTrue(context.findAllAccountAuthority().none {
+        assertTrue(context.findAllAccountAuthority.none {
             it.role.equals(ROLE_ADMIN, true)
         })
     }
@@ -462,7 +462,7 @@ internal class SignupTests {
 
     @Test
     fun `vérifie l'internationalisation des validations par REST avec mot de passe non conforme en francais`() {
-        assertEquals(0, context.countAccount())
+        assertEquals(0, context.countAccount)
         client
             .post()
             .uri(SIGNUP_API_PATH)
@@ -478,7 +478,7 @@ internal class SignupTests {
                 assertTrue(isNotEmpty())
                 assertContains(requestToString(), "la taille doit")
             }
-        assertEquals(0, context.countAccount())
+        assertEquals(0, context.countAccount)
 
     }
 
@@ -496,11 +496,11 @@ internal class SignupTests {
 
     @Test
     fun `test activate avec une clé valide`() {
-        assertEquals(0, context.countAccount())
-        assertEquals(0, context.countAccountAuthority())
+        assertEquals(0, context.countAccount)
+        assertEquals(0, context.countAccountAuthority)
         context.createDataAccounts(setOf(defaultAccount))
-        assertEquals(1, context.countAccount())
-        assertEquals(1, context.countAccountAuthority())
+        assertEquals(1, context.countAccount)
+        assertEquals(1, context.countAccountAuthority)
 
         client
             .get()

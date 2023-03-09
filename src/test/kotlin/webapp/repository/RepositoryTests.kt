@@ -44,29 +44,29 @@ internal class AccountRepositoryR2dbcTest {
     @Test
     fun test_save() {
         mono {
-            val countBefore = context.countAccount()
+            val countBefore = context.countAccount
             assertEquals(0, countBefore)
             accountRepository.save(defaultAccount)
-            assertEquals(countBefore + 1, context.countAccount())
+            assertEquals(countBefore + 1, context.countAccount)
         }
     }
 
     @Test
     fun test_delete() = runBlocking {
-        assertEquals(0, context.countAccount())
+        assertEquals(0, context.countAccount)
         context.createDataAccounts(accounts)
-        assertEquals(accounts.size, context.countAccount())
-        assertEquals(accounts.size + 1, context.countAccountAuthority())
+        assertEquals(accounts.size, context.countAccount)
+        assertEquals(accounts.size + 1, context.countAccountAuthority)
         accountRepository.delete(defaultAccount.toAccount())
-        assertEquals(accounts.size - 1, context.countAccount())
-        assertEquals(accounts.size, context.countAccountAuthority())
+        assertEquals(accounts.size - 1, context.countAccount)
+        assertEquals(accounts.size, context.countAccountAuthority)
     }
 
     @Test
     fun test_findOne_with_Email() = runBlocking {
-        assertEquals(0, context.countAccount())
+        assertEquals(0, context.countAccount)
         context.createDataAccounts(accounts)
-        assertEquals(accounts.size, context.countAccount())
+        assertEquals(accounts.size, context.countAccount)
         assertEquals(
             defaultAccount.login,
             accountRepository.findOne(defaultAccount.email!!)!!.login
@@ -75,9 +75,9 @@ internal class AccountRepositoryR2dbcTest {
 
     @Test
     fun test_findOne_with_Login() = runBlocking {
-        assertEquals(0, context.countAccount())
+        assertEquals(0, context.countAccount)
         context.createDataAccounts(accounts)
-        assertEquals(accounts.size, context.countAccount())
+        assertEquals(accounts.size, context.countAccount)
         assertEquals(
             defaultAccount.email,
             accountRepository.findOne(defaultAccount.login!!)!!.email
@@ -86,8 +86,8 @@ internal class AccountRepositoryR2dbcTest {
 
     @Test
     fun test_signup() {
-        assertEquals(0, context.countAccount())
-        assertEquals(0, context.countAccountAuthority())
+        assertEquals(0, context.countAccount)
+        assertEquals(0, context.countAccountAuthority)
         runBlocking {
             accountRepository.signup(
                 defaultAccount.copy(
@@ -101,16 +101,16 @@ internal class AccountRepositoryR2dbcTest {
                 )
             )
         }
-        assertEquals(1, context.countAccount())
-        assertEquals(1, context.countAccountAuthority())
+        assertEquals(1, context.countAccount)
+        assertEquals(1, context.countAccountAuthority)
     }
 
     @Test
     fun test_findActivationKeyByLogin() {
-        assertEquals(0, context.countAccount())
+        assertEquals(0, context.countAccount)
         context.createDataAccounts(accounts)
-        assertEquals(accounts.size, context.countAccount())
-        assertEquals(accounts.size + 1, context.countAccountAuthority())
+        assertEquals(accounts.size, context.countAccount)
+        assertEquals(accounts.size + 1, context.countAccountAuthority)
         runBlocking {
             assertEquals(
                 context.findOneByEmail(defaultAccount.email!!)!!.activationKey,
@@ -121,10 +121,10 @@ internal class AccountRepositoryR2dbcTest {
 
     @Test
     fun test_findOneByActivationKey() {
-        assertEquals(0, context.countAccount())
+        assertEquals(0, context.countAccount)
         context.createDataAccounts(accounts)
-        assertEquals(accounts.size, context.countAccount())
-        assertEquals(accounts.size + 1, context.countAccountAuthority())
+        assertEquals(accounts.size, context.countAccount)
+        assertEquals(accounts.size + 1, context.countAccountAuthority)
         context.findOneByLogin(defaultAccount.login!!).run findOneByLogin@{
             assertNotNull(this@findOneByLogin)
             assertNotNull(this@findOneByLogin.activationKey)

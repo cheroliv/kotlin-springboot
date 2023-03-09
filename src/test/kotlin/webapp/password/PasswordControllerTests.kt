@@ -49,8 +49,8 @@ internal class PasswordControllerTests {
 
     @Test
     fun `test Change Password Wrong Existing Password`() {
-        val passwordChange = PasswordChange("user", "foobar")
         context.createActivatedUserAndAdmin()
+        val passwordChange = PasswordChange("user", "foobar")
         client
             .post()
             .uri(CHANGE_PASSWORD_API_PATH)
