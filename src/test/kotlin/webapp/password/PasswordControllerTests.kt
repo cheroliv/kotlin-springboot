@@ -19,7 +19,21 @@ import webapp.*
 import webapp.accounts.models.PasswordChange
 import kotlin.test.Test
 
+
+val number:Number = 1
+
+fun foo(){
+    println(number)
+}
+class MathTests {
+    @Test
+    fun `jeux mathématiques`() {
+        foo()
+    }
+}
+
 internal class PasswordControllerTests {
+
     private lateinit var context: ConfigurableApplicationContext
 
     private val client by lazy {
@@ -40,7 +54,7 @@ internal class PasswordControllerTests {
     fun tearDown() = context.deleteAllAccounts()
 
 
-    @Test
+        @Test
     fun `test Change Password Wrong Existing Password`() {
         context.createActivatedUserAndAdmin()
         val passwordChange = PasswordChange("user", "foobar")

@@ -15,7 +15,33 @@ import org.springframework.beans.factory.getBean
 import org.springframework.context.ConfigurableApplicationContext
 import webapp.accounts.models.AccountCredentials
 import kotlin.test.Test
+import org.apache.commons.lang3.StringUtils.stripAccents
+import java.text.Normalizer.Form.NFD
+import java.text.Normalizer.normalize
 
+
+/**
+ *
+ */
+fun Array<String>.nameToLoginNormalizer() = map {
+    it.lowercase().replace(' ', '.').unaccent()
+}.toTypedArray()
+
+/**
+ *
+ */
+@Suppress("unused")
+fun Array<String>.nameToLogin() = map {
+    stripAccents(it.lowercase().replace(' ', '.'))
+}.toTypedArray()
+
+/**
+ *
+ */
+@Suppress("MemberVisibilityCanBePrivate", "SpellCheckingInspection")
+fun CharSequence.unaccent() = "\\p{InCombiningDiacriticalMarks}+"
+    .toRegex()
+    .replace(normalize(this, NFD), "")
 
 val adminAccount by lazy { accountCredentialsFactory(ADMIN) }
 val defaultAccount by lazy { accountCredentialsFactory(USER) }
