@@ -90,20 +90,19 @@ fun ApplicationContext.userToken(accountCredentials: AccountCredentials) = mono 
 }.block()!!
 
 fun ApplicationContext.createActivatedUserAndAdmin() {
-    val dao: R2dbcEntityTemplate = getBean()
-    val countUserBefore = countAccount(dao)
-    val countUserAuthBefore = countAccountAuthority(dao)
+    val countUserBefore = countAccount()
+    val countUserAuthBefore = countAccountAuthority()
     assertEquals(0, countUserBefore)
     assertEquals(0, countUserAuthBefore)
-    createActivatedDataAccounts(setOf(defaultAccount, adminAccount), dao)
-    assertEquals(2, countAccount(dao))
-    assertEquals(3, countAccountAuthority(dao))
-    findOneByEmail(defaultAccount.email!!, dao).run {
+    createActivatedDataAccounts(setOf(defaultAccount, adminAccount))
+    assertEquals(2, countAccount())
+    assertEquals(3, countAccountAuthority())
+    findOneByEmail(defaultAccount.email!!).run {
         assertNotNull(this)
         assertTrue(activated)
         assertNull(activationKey)
     }
-    findOneByEmail(adminAccount.email!!, dao).run {
+    findOneByEmail(adminAccount.email!!).run {
         assertNotNull(this)
         assertTrue(activated)
         assertNull(activationKey)
@@ -114,9 +113,9 @@ fun ByteArray.requestToString(): String = map {
     it.toInt().toChar().toString()
 }.reduce { acc: String, s: String -> acc + s }
 
-fun createDataAccounts(accounts: Set<AccountCredentials>, dao: R2dbcEntityTemplate) {
-    assertEquals(0, countAccount(dao))
-    assertEquals(0, countAccountAuthority(dao))
+fun ApplicationContext.createDataAccounts(accounts: Set<AccountCredentials>) {
+    assertEquals(0, countAccount())
+    assertEquals(0, countAccountAuthority())
     accounts.map { acc ->
         AccountEntity(acc.copy(
             activationKey = generateActivationKey,
@@ -129,9 +128,9 @@ fun createDataAccounts(accounts: Set<AccountCredentials>, dao: R2dbcEntityTempla
                 if (acc.login == ADMIN) add(ROLE_ADMIN)
             }
         )).run {
-            dao.insert(this).block()!!.id!!.let { uuid ->
+            getBean<R2dbcEntityTemplate>().insert(this).block()!!.id!!.let { uuid ->
                 authorities!!.map { authority ->
-                    dao.insert(
+                    getBean<R2dbcEntityTemplate>().insert(
                         AccountAuthorityEntity(
                             userId = uuid,
                             role = authority.role
@@ -141,8 +140,8 @@ fun createDataAccounts(accounts: Set<AccountCredentials>, dao: R2dbcEntityTempla
             }
         }
     }
-    assertEquals(accounts.size, countAccount(dao))
-    assertTrue(accounts.size <= countAccountAuthority(dao))
+    assertEquals(accounts.size, countAccount())
+    assertTrue(accounts.size <= countAccountAuthority())
 }
 
 
@@ -170,9 +169,9 @@ fun ByteArray.logBodyRaw(): ByteArray = apply {
 }
 
 
-fun createActivatedDataAccounts(accounts: Set<AccountCredentials>, dao: R2dbcEntityTemplate) {
-    assertEquals(0, countAccount(dao))
-    assertEquals(0, countAccountAuthority(dao))
+fun ApplicationContext.createActivatedDataAccounts(accounts: Set<AccountCredentials>) {
+    assertEquals(0, countAccount())
+    assertEquals(0, countAccountAuthority())
     accounts.map { acc ->
         AccountEntity(
             acc.copy(
@@ -187,9 +186,9 @@ fun createActivatedDataAccounts(accounts: Set<AccountCredentials>, dao: R2dbcEnt
                 }.toSet()
             )
         ).run {
-            dao.insert(this).block()!!.id!!.let { uuid ->
+            getBean<R2dbcEntityTemplate>().insert(this).block()!!.id!!.let { uuid ->
                 authorities!!.map { authority ->
-                    dao.insert(
+                    getBean<R2dbcEntityTemplate>().insert(
                         AccountAuthorityEntity(
                             userId = uuid,
                             role = authority.role
@@ -199,16 +198,16 @@ fun createActivatedDataAccounts(accounts: Set<AccountCredentials>, dao: R2dbcEnt
             }
         }
     }
-    assertEquals(accounts.size, countAccount(dao))
-    assertTrue(accounts.size <= countAccountAuthority(dao))
+    assertEquals(accounts.size, countAccount())
+    assertTrue(accounts.size <= countAccountAuthority())
 }
 
 fun ApplicationContext.deleteAllAccounts() {
-    val dao: R2dbcEntityTemplate=getBean()
+    val dao: R2dbcEntityTemplate = getBean()
     deleteAllAccountAuthority(dao)
     deleteAccounts(dao)
-    assertEquals(0, countAccount(dao))
-    assertEquals(0, countAccountAuthority(dao))
+    assertEquals(0, countAccount())
+    assertEquals(0, countAccountAuthority())
 }
 
 fun deleteAccounts(repository: R2dbcEntityTemplate) {
@@ -246,25 +245,26 @@ fun saveAccountAuthority(
     dao.insert(AccountAuthorityEntity(userId = id, role = role)).block()
 
 
-fun countAccount(dao: R2dbcEntityTemplate): Int =
-    dao.select(AccountEntity::class.java).count().block()?.toInt()!!
+fun ApplicationContext.countAccount(): Int =
+    getBean<R2dbcEntityTemplate>().select(AccountEntity::class.java).count().block()?.toInt()!!
 
 
-fun countAccountAuthority(dao: R2dbcEntityTemplate): Int =
-    dao.select(AccountAuthorityEntity::class.java).count().block()?.toInt()!!
+fun ApplicationContext.countAccountAuthority(): Int =
+    getBean<R2dbcEntityTemplate>().select(AccountAuthorityEntity::class.java).count().block()?.toInt()!!
 
 
-fun findOneByLogin(login: String, dao: R2dbcEntityTemplate): AccountCredentials? =
-    dao.select<AccountEntity>()
+fun ApplicationContext.findOneByLogin(login: String): AccountCredentials? =
+    getBean<R2dbcEntityTemplate>().select<AccountEntity>()
         .matching(query(where("login").`is`(login).ignoreCase(true)))
         .one().block()?.toCredentialsModel
 
-fun findOneByEmail(email: String, dao: R2dbcEntityTemplate): AccountCredentials? = dao.select<AccountEntity>()
+fun ApplicationContext.findOneByEmail(email: String): AccountCredentials? =
+    getBean<R2dbcEntityTemplate>().select<AccountEntity>()
     .matching(query(where("email").`is`(email).ignoreCase(true)))
     .one().block()?.toCredentialsModel
 
-fun findAllAccountAuthority(dao: R2dbcEntityTemplate): Set<AccountAuthorityEntity> =
-    dao.select(AccountAuthorityEntity::class.java).all().toIterable().toHashSet()
+fun ApplicationContext.findAllAccountAuthority(): Set<AccountAuthorityEntity> =
+    getBean<R2dbcEntityTemplate>().select(AccountAuthorityEntity::class.java).all().toIterable().toHashSet()
 
 private fun createObjectMapper() =
     ObjectMapper().apply {

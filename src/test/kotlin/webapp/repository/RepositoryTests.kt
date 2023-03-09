@@ -9,7 +9,6 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
 import org.springframework.beans.factory.getBean
 import org.springframework.context.ConfigurableApplicationContext
-import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import webapp.*
 import webapp.Constants.DEFAULT_LANGUAGE
 import webapp.Constants.ROLE_USER
@@ -27,14 +26,8 @@ import kotlin.test.assertNotNull
 
 internal class AccountRepositoryR2dbcTest {
     private lateinit var context: ConfigurableApplicationContext
-
-    private val dao: R2dbcEntityTemplate by lazy { context.getBean() }
     private val accountRepository: AccountRepository by lazy { context.getBean<AccountRepositoryR2dbc>() }
 
-    //    @BeforeAll
-//    fun `lance le server en profile test`() = runApplication<Application> {
-//        testLoader(this)
-//    }.run { context = this }
     @BeforeAll
     fun `lance le server en profile test`() {
         context = launcher()
@@ -51,29 +44,29 @@ internal class AccountRepositoryR2dbcTest {
     @Test
     fun test_save() {
         mono {
-            val countBefore = countAccount(dao)
+            val countBefore = context.countAccount()
             assertEquals(0, countBefore)
             accountRepository.save(defaultAccount)
-            assertEquals(countBefore + 1, countAccount(dao))
+            assertEquals(countBefore + 1, context.countAccount())
         }
     }
 
     @Test
     fun test_delete() = runBlocking {
-        assertEquals(0, countAccount(dao))
-        createDataAccounts(accounts, dao)
-        assertEquals(accounts.size, countAccount(dao))
-        assertEquals(accounts.size + 1, countAccountAuthority(dao))
+        assertEquals(0, context.countAccount())
+        context.createDataAccounts(accounts)
+        assertEquals(accounts.size, context.countAccount())
+        assertEquals(accounts.size + 1, context.countAccountAuthority())
         accountRepository.delete(defaultAccount.toAccount())
-        assertEquals(accounts.size - 1, countAccount(dao))
-        assertEquals(accounts.size, countAccountAuthority(dao))
+        assertEquals(accounts.size - 1, context.countAccount())
+        assertEquals(accounts.size, context.countAccountAuthority())
     }
 
     @Test
     fun test_findOne_with_Email() = runBlocking {
-        assertEquals(0, countAccount(dao))
-        createDataAccounts(accounts, dao)
-        assertEquals(accounts.size, countAccount(dao))
+        assertEquals(0, context.countAccount())
+        context.createDataAccounts(accounts)
+        assertEquals(accounts.size, context.countAccount())
         assertEquals(
             defaultAccount.login,
             accountRepository.findOne(defaultAccount.email!!)!!.login
@@ -82,9 +75,9 @@ internal class AccountRepositoryR2dbcTest {
 
     @Test
     fun test_findOne_with_Login() = runBlocking {
-        assertEquals(0, countAccount(dao))
-        createDataAccounts(accounts, dao)
-        assertEquals(accounts.size, countAccount(dao))
+        assertEquals(0, context.countAccount())
+        context.createDataAccounts(accounts)
+        assertEquals(accounts.size, context.countAccount())
         assertEquals(
             defaultAccount.email,
             accountRepository.findOne(defaultAccount.login!!)!!.email
@@ -93,8 +86,8 @@ internal class AccountRepositoryR2dbcTest {
 
     @Test
     fun test_signup() {
-        assertEquals(0, countAccount(dao))
-        assertEquals(0, countAccountAuthority(dao))
+        assertEquals(0, context.countAccount())
+        assertEquals(0, context.countAccountAuthority())
         runBlocking {
             accountRepository.signup(
                 defaultAccount.copy(
@@ -108,19 +101,19 @@ internal class AccountRepositoryR2dbcTest {
                 )
             )
         }
-        assertEquals(1, countAccount(dao))
-        assertEquals(1, countAccountAuthority(dao))
+        assertEquals(1, context.countAccount())
+        assertEquals(1, context.countAccountAuthority())
     }
 
     @Test
     fun test_findActivationKeyByLogin() {
-        assertEquals(0, countAccount(dao))
-        createDataAccounts(accounts, dao)
-        assertEquals(accounts.size, countAccount(dao))
-        assertEquals(accounts.size + 1, countAccountAuthority(dao))
+        assertEquals(0, context.countAccount())
+        context.createDataAccounts(accounts)
+        assertEquals(accounts.size, context.countAccount())
+        assertEquals(accounts.size + 1, context.countAccountAuthority())
         runBlocking {
             assertEquals(
-                findOneByEmail(defaultAccount.email!!, dao)!!.activationKey,
+                context.findOneByEmail(defaultAccount.email!!)!!.activationKey,
                 accountRepository.findActivationKeyByLogin(defaultAccount.login!!)
             )
         }
@@ -128,11 +121,11 @@ internal class AccountRepositoryR2dbcTest {
 
     @Test
     fun test_findOneByActivationKey() {
-        assertEquals(0, countAccount(dao))
-        createDataAccounts(accounts, dao)
-        assertEquals(accounts.size, countAccount(dao))
-        assertEquals(accounts.size + 1, countAccountAuthority(dao))
-        findOneByLogin(defaultAccount.login!!, dao).run findOneByLogin@{
+        assertEquals(0, context.countAccount())
+        context.createDataAccounts(accounts)
+        assertEquals(accounts.size, context.countAccount())
+        assertEquals(accounts.size + 1, context.countAccountAuthority())
+        context.findOneByLogin(defaultAccount.login!!).run findOneByLogin@{
             assertNotNull(this@findOneByLogin)
             assertNotNull(this@findOneByLogin.activationKey)
             runBlocking {

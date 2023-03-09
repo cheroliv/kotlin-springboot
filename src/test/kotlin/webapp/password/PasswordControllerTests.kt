@@ -11,7 +11,10 @@ import org.junit.jupiter.api.BeforeAll
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.http.HttpHeaders.AUTHORIZATION
 import org.springframework.http.MediaType.APPLICATION_JSON
+import org.springframework.http.ProblemDetail
+import org.springframework.http.ResponseEntity
 import org.springframework.test.web.reactive.server.WebTestClient.bindToServer
+import org.springframework.test.web.reactive.server.returnResult
 import webapp.Constants.BASE_URL_DEV
 import webapp.Constants.CHANGE_PASSWORD_API_PATH
 import webapp.DataTests.defaultAccount
@@ -60,7 +63,7 @@ internal class PasswordControllerTests {
             .exchange()
             .expectStatus()
             .is5xxServerError
-
+            .returnResult<ResponseEntity<ProblemDetail>>()
     }
 
 
