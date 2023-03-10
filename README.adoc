@@ -22,8 +22,8 @@
 
 .features:
 * Signup account
-* Password reset and update(in progress)
-* Account management(todo)
+* Password reset and update
+* Account management
 
 
 ==== **to test the app**
