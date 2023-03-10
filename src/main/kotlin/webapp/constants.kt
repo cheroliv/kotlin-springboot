@@ -16,36 +16,43 @@ const val BASE_URL_DEV = "http://localhost:8080"
 const val PROBLEM_OBJECT_NAME = "objectName"
 const val PROBLEM_FIELD = "field"
 const val PROBLEM_MESSAGE = "message"
-val detailsKeys = setOf(
-    PROBLEM_OBJECT_NAME,
-    PROBLEM_FIELD,
-    PROBLEM_MESSAGE
-)
-val validationProblems = ProblemsModel(
-    type = "https://cheroliv.github.io/problem/constraint-violation",
-    title = "Data binding and validation failure",
-    message = "error.validation",
-    path = "",
-    status = BAD_REQUEST.value(),
-)
+val detailsKeys by lazy {
+    setOf(
+        PROBLEM_OBJECT_NAME,
+        PROBLEM_FIELD,
+        PROBLEM_MESSAGE
+    )
+}
+val validationProblems by lazy {
+    ProblemsModel(
+        type = "https://cheroliv.github.io/problem/constraint-violation",
+        title = "Data binding and validation failure",
+        message = "error.validation",
+        status = BAD_REQUEST.value(),
+    )
+}
 
-val serverErrorProblems = ProblemsModel(
-    type = "https://cheroliv.github.io/problem/internal-server-error",
-    title = "Internal Server Error",
-    message = "error.server",
-    status = INTERNAL_SERVER_ERROR.value(),
-)
+val serverErrorProblems by lazy {
+    ProblemsModel(
+        type = "https://cheroliv.github.io/problem/internal-server-error",
+        title = "Internal Server Error",
+        message = "error.server",
+        status = INTERNAL_SERVER_ERROR.value(),
+    )
+}
 
 //SignupController
-val ALLOWED_ORDERED_PROPERTIES = arrayOf(
-    "id",
-    "login",
-    "firstName",
-    "lastName",
-    "email",
-    "activated",
-    "langKey"
-)
+val ALLOWED_ORDERED_PROPERTIES by lazy {
+    arrayOf(
+        "id",
+        "login",
+        "firstName",
+        "lastName",
+        "email",
+        "activated",
+        "langKey"
+    )
+}
 const val NORMAL_TERMINATION = 0
 const val DOMAIN_DEV_URL = "acme.com"
 private const val DOMAIN_URL = "https://cheroliv.github.io"

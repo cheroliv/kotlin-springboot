@@ -14,13 +14,12 @@ import webapp.entities.AccountRecord.Companion.PASSWORD_FIELD
 import webapp.exceptions.InvalidPasswordException
 import webapp.http.badResponse
 import webapp.logging.w
+import webapp.mail.MailService
 import webapp.models.AccountCredentials
 import webapp.models.KeyAndPassword
 import webapp.models.PasswordChange
-import webapp.mail.MailService
 
 /*=================================================================================*/
-@Suppress("unused")
 @RestController
 @RequestMapping(ACCOUNT_API)
 class PasswordController(

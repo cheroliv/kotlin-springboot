@@ -27,3 +27,5 @@ and launch http://localhost:8080/
 
 ==== **to run the cli**
 Open terminal and run : ```./gradlew cli``` +
+
+link:cadrage_webapp.adoc[Project phases in french]

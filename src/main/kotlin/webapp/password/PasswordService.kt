@@ -14,7 +14,6 @@ class PasswordService(private val accountRepository: AccountRepository) {
         TODO("Not yet implemented")
     }
 
-    //    @Transactional
 //    suspend fun changePassword(currentClearTextPassword: String, newPassword: String) {
 //        securityUtils.getCurrentUserLogin().apply {
 //            if (!isNullOrBlank()) {
