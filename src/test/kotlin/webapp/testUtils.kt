@@ -278,7 +278,7 @@ val ApplicationContext.findAllAccountAuthority: Set<AccountAuthorityEntity>
         .toIterable()
         .toHashSet()
 
-private val createObjectMapper
+private val mapperFactory
     get() = ObjectMapper().apply {
         configure(WRITE_DURATIONS_AS_TIMESTAMPS, false)
         setSerializationInclusion(NON_EMPTY)
@@ -293,7 +293,7 @@ private val createObjectMapper
  * @throws IOException
  */
 @Throws(IOException::class)
-fun convertObjectToJsonBytes(`object`: Any): ByteArray = createObjectMapper.writeValueAsBytes(`object`)
+fun convertObjectToJsonBytes(`object`: Any): ByteArray = mapperFactory.writeValueAsBytes(`object`)
 
 /**
  * Create a byte array with a specific size filled with specified data.
