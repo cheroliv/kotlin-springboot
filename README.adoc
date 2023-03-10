@@ -3,14 +3,16 @@
 == *springboot codebase*
 
 .stack:
-* springboot
 * webflux
-* spring data r2dbc
+* r2dbc
 * rest api
 * spring security jwt
-* kotlin coroutines
-* Http problem details
+* coroutines
+* Http problem details RFC7807
 * cli: command line interface
+* i18n
+* scheduling
+* junit5
 
 .features:
 * Signup account
