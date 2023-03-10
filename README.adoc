@@ -13,6 +13,10 @@
 * i18n
 * scheduling
 * junit5
+* gradle
+* gradle-kotlin-dsl
+* jib
+* appengine
 
 .features:
 * Signup account
