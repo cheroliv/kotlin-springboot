@@ -59,3 +59,10 @@ Board en une phrase complète.
 == Mindmap
 
 
+== cadrage kotlin-springboot
+
+=== Atelier 1 : Vision
+
+==== 1. Le pattern “QQOQCP” – Qui, Quoi, Où, Quand, Comment, Pourquoi
+
+
