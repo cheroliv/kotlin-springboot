@@ -4,19 +4,20 @@
 
 .stack:
 * webflux
-* r2dbc
+* r2dbc h2
 * rest api
 * spring security jwt
 * coroutines
 * Http problem details RFC7807
-* cli: command line interface
-* i18n
-* scheduling
 * junit5
 * gradle
 * gradle-kotlin-dsl
-* jib
-* appengine
+* google-jib
+* google-appengine
+* mailSlurp-api
+* gmail-api
+* task scheduling
+* cli: command line interface
 
 .features:
 * Signup account
