@@ -18,11 +18,12 @@
 * gmail-api
 * task scheduling
 * cli: command line interface
+* github-action(todo)
 
 .features:
 * Signup account
-* Password reset and update
-* Account management
+* Password reset and update(in progress)
+* Account management(todo)
 
 
 ==== **to test the app**
