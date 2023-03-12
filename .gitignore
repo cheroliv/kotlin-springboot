@@ -20,4 +20,4 @@ bin
 .settings
 /src/main/resources/application-mailslurp.yml
 .vscode
-kotlin-springboot.code-workspace
+kotlin-springboot-springdata.code-workspace

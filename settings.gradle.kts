@@ -24,4 +24,4 @@ pluginManagement {
         }
     }    
 }
-rootProject.name = "kotlin-springboot"
+rootProject.name = "kotlin-springboot-springdata"

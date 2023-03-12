@@ -1,10 +1,10 @@
-= kotlin-springboot
+= kotlin-springboot-springdata
 
 == *springboot codebase*
 
 .stack:
 * webflux
-* r2dbc h2
+* r2dbc spring-data h2
 * rest api
 * spring security jwt
 * coroutines

@@ -1,4 +1,4 @@
-= Cadrage kotlin-springboot
+= Cadrage kotlin-springboot-springdata
 @CherOliv
 2022-12-31
 :summary: simple mémo sur le cadrage d'un projet.
