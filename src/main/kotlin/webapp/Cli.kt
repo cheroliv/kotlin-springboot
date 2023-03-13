@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component
 import webapp.logging.i
 import kotlin.system.exitProcess
 
+
 @Component
 @Profile(CLI)
 class Cli : CommandLineRunner {
