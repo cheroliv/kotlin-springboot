@@ -13,7 +13,7 @@ class PasswordService(private val accountRepository: AccountRepository) {
     fun changePassword(currentPassword: String, newPassword: String) {
         TODO("Not yet implemented")
     }
-
+//TODO: renvoi une ValidationViolationException ou une InvalidPasswordException
 //    suspend fun changePassword(currentClearTextPassword: String, newPassword: String) {
 //        securityUtils.getCurrentUserLogin().apply {
 //            if (!isNullOrBlank()) {

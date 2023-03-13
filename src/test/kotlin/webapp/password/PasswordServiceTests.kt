@@ -8,10 +8,12 @@ import org.junit.jupiter.api.BeforeAll
 import org.springframework.context.ConfigurableApplicationContext
 import webapp.deleteAllAccounts
 import webapp.launcher
+import webapp.logging.i
 import kotlin.test.Test
 
 class PasswordServiceTests {
     private lateinit var context: ConfigurableApplicationContext
+
     @BeforeAll
     fun `lance le server en profile test`() {
         context = launcher()
@@ -24,7 +26,23 @@ class PasswordServiceTests {
     fun tearDown() = context.deleteAllAccounts()
 
     @Test
-    fun `canary`() {
+    fun `le currentPassword est invalid`() {
+        i("le currentPassword est invalid")
+    }
 
+    @Test
+    fun `le newPassword est invalid`() {
+        i("le newPassword est invalid")
+    }
+
+    @Test
+    fun `le currentPassword ne match pas`() {
+        i("le currentPassword ne match pas")
+
+    }
+
+    @Test
+    fun `le currentPassword et le newPassword sont valide`() {
+        i("le currentPassword et le newPassword sont valide")
     }
 }

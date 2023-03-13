@@ -27,13 +27,16 @@
 
 
 ==== **to test the app**
+
 Open terminal and run : ```./gradlew check```
 
 ==== **to run the app**
+
 Open terminal and run : ```./gradlew bootRun``` +
 and launch http://localhost:8080/
 
 ==== **to run the cli**
+
 Open terminal and run : ```./gradlew cli``` +
 
 link:cadrage_webapp.adoc[Project phases in french]

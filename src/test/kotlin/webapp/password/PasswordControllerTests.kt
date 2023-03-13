@@ -26,6 +26,7 @@ val number:Number = 1
 fun foo(){
     println(number)
 }
+
 class MathTests {
     @Test
     fun `jeux mathématiques`() {

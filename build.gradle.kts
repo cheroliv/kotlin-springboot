@@ -120,7 +120,6 @@ configurations {
     }
 }
 
-//java.sourceCompatibility = JavaVersion.VERSION_8
 
 tasks.withType<KotlinCompile> {
     kotlinOptions {
