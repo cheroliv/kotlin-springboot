@@ -14,9 +14,7 @@ buildscript {
         gradlePluginPortal()
         google()
     }
-    dependencies {
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.10")
-    }
+    dependencies { classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.10") }
 }
 
 plugins {
@@ -65,7 +63,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-mail")
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
-//    implementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity6")
     implementation("com.mailslurp:mailslurp-client-kotlin:${properties["mailslurp-client-kotlin.version"]}")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
