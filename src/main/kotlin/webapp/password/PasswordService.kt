@@ -5,7 +5,7 @@ import org.springframework.transaction.annotation.Transactional
 import webapp.logging.d
 import webapp.models.AccountCredentials
 import webapp.repository.AccountRepository
-import java.time.Instant
+import java.time.Instant.now
 
 @Service
 @Transactional
@@ -36,7 +36,7 @@ class PasswordService(private val accountRepository: AccountRepository) {
 //    }
     suspend fun completePasswordReset(newPassword: String, key: String): AccountCredentials? =
         accountRepository.findOneByResetKey(key).run {
-            if (this != null && resetDate?.isAfter(Instant.now().minusSeconds(86400)) == true) {
+            if (this != null && resetDate?.isAfter(now().minusSeconds(86400)) == true) {
                 d("Reset account password for reset key $key")
                 return@completePasswordReset toCredentialsModel
                 //                return saveUser(
