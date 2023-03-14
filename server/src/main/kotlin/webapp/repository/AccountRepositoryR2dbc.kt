@@ -64,7 +64,7 @@ class AccountRepositoryR2dbc(
         account.id == null -> null
         else -> account.copy(authorities = mutableSetOf<String>().apply {
             dao.select<AccountAuthorityEntity>()
-                .matching(query(where(ACCOUNT_AUTH_USER_ID_FIELD).`is`(account.id)))
+                .matching(query(where(ACCOUNT_AUTH_USER_ID_FIELD).`is`(account.id!!)))
                 .all()
                 .collect { add(it.role) }
         })
@@ -110,8 +110,8 @@ class AccountRepositoryR2dbc(
         when {
             account.login != null || account.email != null && account.id == null -> (
                     when {
-                        account.login != null -> findOne(account.login)
-                        account.email != null -> findOne(account.email)
+                        account.login != null -> findOne(account.login!!)
+                        account.email != null -> findOne(account.email!!)
                         else -> null
                     }).run {
                 if (this != null) dao

@@ -1,9 +1,8 @@
-# Project exclude paths
+/src/main/resources/application-mailslurp.yml
 /build/
 .gradle
 .idea
 gradle/wrapper/gradle-wrapper.jar
-data
 kotlin-js-store/yarn.lock
 bin
 .classpath
@@ -11,6 +10,4 @@ bin
 .settings
 local.properties
 .vscode
-private
-
-kotlin-springboot-springdata.code-workspace
+out

@@ -23,23 +23,6 @@ val detailsKeys by lazy {
         PROBLEM_MESSAGE
     )
 }
-val validationProblems by lazy {
-    ProblemsModel(
-        type = "https://cheroliv.github.io/problem/constraint-violation",
-        title = "Data binding and validation failure",
-        message = "error.validation",
-        status = BAD_REQUEST.value(),
-    )
-}
-
-val serverErrorProblems by lazy {
-    ProblemsModel(
-        type = "https://cheroliv.github.io/problem/internal-server-error",
-        title = "Internal Server Error",
-        message = "error.server",
-        status = INTERNAL_SERVER_ERROR.value(),
-    )
-}
 
 //SignupController
 val ALLOWED_ORDERED_PROPERTIES by lazy {
@@ -160,21 +143,16 @@ const val TEMPLATE_NAME_PASSWORD = "mail/passwordResetEmail"
 
 const val TITLE_KEY_PASSWORD = "email.reset.title"
 
-// Regex for acceptable logins
-const val LOGIN_REGEX =
-    "^(?>[a-zA-Z0-9!$&*+=?^_`{|}~.-]+@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*)|(?>[_.@A-Za-z0-9-]+)$"
 const val SYSTEM_USER = "system"
 
 
 @Suppress("SpellCheckingInspection")
 const val ANONYMOUS_USER: String = "anonymoususer"
 const val DEFAULT_LANGUAGE = "en"
-const val PASSWORD_MIN: Int = 4
-const val PASSWORD_MAX: Int = 24
+
 const val ERR_CONCURRENCY_FAILURE: String = "error.concurrencyFailure"
 const val ERR_VALIDATION: String = "error.validation"
 const val USER_INITIAL_ACTIVATED_VALUE = false
-const val IMAGE_URL_DEFAULT = "http://placehold.it/50x50"
 private const val PROBLEM_BASE_URL: String = "$DOMAIN_URL/problem"
 
 
@@ -192,3 +170,22 @@ val EMAIL_ALREADY_USED_TYPE: URI = create("$PROBLEM_BASE_URL/email-already-used"
 
 @JvmField
 val LOGIN_ALREADY_USED_TYPE: URI = create("$PROBLEM_BASE_URL/login-already-used")
+
+
+val validationProblems by lazy {
+    ProblemsModel(
+        type = "https://cheroliv.github.io/problem/constraint-violation",
+        title = "Data binding and validation failure",
+        message = "error.validation",
+        status = BAD_REQUEST.value(),
+    )
+}
+
+val serverErrorProblems by lazy {
+    ProblemsModel(
+        type = "https://cheroliv.github.io/problem/internal-server-error",
+        title = "Internal Server Error",
+        message = "error.server",
+        status = INTERNAL_SERVER_ERROR.value(),
+    )
+}

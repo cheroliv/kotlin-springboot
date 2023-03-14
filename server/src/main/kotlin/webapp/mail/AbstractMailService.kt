@@ -4,7 +4,6 @@ import org.springframework.context.MessageSource
 import org.thymeleaf.context.Context
 import org.thymeleaf.spring6.SpringTemplateEngine
 import webapp.*
-import webapp.Properties
 import webapp.logging.d
 import webapp.models.AccountCredentials
 import java.util.Locale.forLanguageTag
@@ -36,7 +35,7 @@ abstract class AbstractMailService(
 
             else -> forLanguageTag(account.langKey).apply {
                 sendEmail(
-                    account.email,
+                    account.email!!,
                     messageSource.getMessage(titleKey, null, this),
                     templateEngine.process(templateName, Context(this).apply {
                         setVariable(USER, account)

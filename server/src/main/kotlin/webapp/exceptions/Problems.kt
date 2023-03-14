@@ -5,8 +5,6 @@ package webapp.exceptions
 import org.springframework.core.env.Environment
 import org.springframework.http.ProblemDetail
 import org.springframework.http.ResponseEntity
-import org.springframework.stereotype.Component
-import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.server.ServerWebExchange
 import webapp.Properties
 import java.io.Serializable

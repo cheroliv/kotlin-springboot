@@ -1,6 +1,6 @@
 package webapp.models
 
-import org.apache.commons.lang3.RandomStringUtils
+import org.apache.commons.lang3.RandomStringUtils.random
 import java.security.SecureRandom
 
 object AccountUtils {
@@ -10,7 +10,7 @@ object AccountUtils {
     }
 
     private val generateRandomAlphanumericString: String
-        get() = RandomStringUtils.random(
+        get() = random(
             DEF_COUNT,
             0,
             0,

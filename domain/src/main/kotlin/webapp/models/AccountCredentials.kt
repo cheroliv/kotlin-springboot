@@ -4,7 +4,6 @@ package webapp.models
 
 import jakarta.validation.constraints.*
 import webapp.*
-import webapp.http.objectName
 import java.time.Instant
 import java.util.*
 
@@ -79,4 +78,6 @@ fun AccountCredentials.toAccount(): Account = Account(
     lastModifiedDate = lastModifiedDate,
     authorities = authorities
 )
+
+val String.objectName get() = replaceFirst(first(), first().lowercaseChar())
 

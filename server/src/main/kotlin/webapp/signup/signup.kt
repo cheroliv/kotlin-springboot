@@ -1,8 +1,8 @@
 package webapp.signup
 
-import webapp.http.badResponse
 import webapp.entities.AccountRecord.Companion.EMAIL_FIELD
 import webapp.entities.AccountRecord.Companion.LOGIN_FIELD
+import webapp.http.badResponse
 import webapp.models.AccountCredentials
 import webapp.models.AccountCredentials.Companion.objectName
 import webapp.models.ProblemsModel

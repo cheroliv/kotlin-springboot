@@ -23,7 +23,6 @@ import java.net.URI
 import java.util.Locale.ENGLISH
 import java.util.Locale.of
 
-val String.objectName get() = replaceFirst(first(), first().lowercaseChar())
 
 //TODO: i18n
 fun ProblemsModel.serverErrorResponse(error: String)

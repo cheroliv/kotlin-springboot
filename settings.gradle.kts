@@ -27,7 +27,7 @@ pluginManagement {
     }
 }
 
-rootProject.name = "kotlin-springboot-springdata"
+rootProject.name = "kotlin-springboot"
 listOf(
     "domain",
     "repositories",

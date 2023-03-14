@@ -61,8 +61,8 @@ class PasswordController(
                 keyAndPassword.newPassword != null
                         && keyAndPassword.key != null
                         && passwordService.completePasswordReset(
-                    keyAndPassword.newPassword,
-                    keyAndPassword.key
+                    keyAndPassword.newPassword!!,
+                    keyAndPassword.key!!
                 ) == null -> throw PasswordException("No user was found for this reset key")
             }
         }
@@ -88,8 +88,8 @@ class PasswordController(
                 && passwordChange.newPassword != null
             ) {
                 passwordService.changePassword(
-                    passwordChange.currentPassword,
-                    passwordChange.newPassword
+                    passwordChange.currentPassword!!,
+                    passwordChange.newPassword!!
                 )
             }
             ResponseEntity(OK)
