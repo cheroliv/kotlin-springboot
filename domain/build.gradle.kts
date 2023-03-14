@@ -27,12 +27,14 @@ repositories {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-    implementation("org.jetbrains.kotlin:kotlin-reflect")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:${properties["kotlinx_serialization_json.version"]}")
-    implementation("org.apache.commons:commons-lang3:${properties["common-lang3.version"]}")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:${properties["kotlin-jackson.version"]}")
-    implementation("jakarta.validation:jakarta.validation-api:${properties["jakarta.validation-api.version"]}")
+    setOf(
+        "org.jetbrains.kotlin:kotlin-stdlib-jdk8",
+        "org.jetbrains.kotlin:kotlin-reflect",
+        "org.jetbrains.kotlinx:kotlinx-serialization-json:${properties["kotlinx_serialization_json.version"]}",
+        "org.apache.commons:commons-lang3:${properties["common-lang3.version"]}",
+        "com.fasterxml.jackson.module:jackson-module-kotlin:${properties["kotlin-jackson.version"]}",
+        "jakarta.validation:jakarta.validation-api:${properties["jakarta.validation-api.version"]}"
+    ).forEach(::implementation)
 }
 
 modernizer {

@@ -1,6 +1,6 @@
 @file:Suppress("unused", "MemberVisibilityCanBePrivate")
 
-package webapp
+package webapp.models
 
 const val IMAGE_URL_DEFAULT = "http://placehold.it/50x50"
 // Regex for acceptable logins

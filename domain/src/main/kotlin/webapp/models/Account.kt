@@ -4,8 +4,6 @@ import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Pattern
 import jakarta.validation.constraints.Size
-import webapp.IMAGE_URL_DEFAULT
-import webapp.LOGIN_REGEX
 import java.time.Instant
 import java.util.*
 

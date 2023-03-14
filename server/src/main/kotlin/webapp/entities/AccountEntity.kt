@@ -8,8 +8,8 @@ import jakarta.validation.constraints.Size
 import org.springframework.data.annotation.*
 import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Table
-import webapp.LOGIN_REGEX
 import webapp.models.AccountCredentials
+import webapp.models.LOGIN_REGEX
 import java.time.Instant
 import java.util.*
 
